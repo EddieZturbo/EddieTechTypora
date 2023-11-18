@@ -4,6 +4,35 @@
 
 ![image-20221120230430368](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221120230430368.png)
 
+## Concepts
+
+> - **Convention over Configuration:**
+>    - Spring Boot follows the principle of "convention over configuration." This means that it provides sensible defaults and conventions, reducing the need for extensive configuration files.
+>
+> - **Spring Boot Initializer:**
+>    - The Spring Boot Initializer is a web-based tool that helps you bootstrap a new Spring Boot application. You can select the dependencies you need, and it generates a basic project structure for you.
+>
+> - **Starter Templates:**
+>    - Spring Boot introduces the concept of "starters," which are pre-configured templates for commonly used libraries and frameworks. These starters help in quickly setting up dependencies for specific tasks, such as web development, data access, or messaging.
+>
+> - **Auto-Configuration:**
+>    - Spring Boot uses auto-configuration to automatically configure your application based on the dependencies in your classpath. It scans for libraries and frameworks and configures them based on best practices. You can override these configurations if needed.
+>
+> - **Embedded Server:**
+>    - Spring Boot includes an embedded web server (like Tomcat, Jetty, or Undertow) so that you can run your application as a standalone JAR file. This eliminates the need for deploying your application to an external server.
+>
+> - **Application Properties and YAML:**
+>    - Spring Boot applications can be configured using properties files or YAML files. Configuration properties can be set to customize the behavior of various components.
+>
+> - **Spring Boot Annotations:**
+>    - Spring Boot utilizes annotations such as `@SpringBootApplication`, which combines `@Configuration`, `@EnableAutoConfiguration`, and `@ComponentScan`. This annotation simplifies the setup of a Spring application.
+>
+> - **Dependency Injection:**
+>    - Spring Boot heavily relies on the Spring Framework's core principle of dependency injection. It manages and wires the components of your application, making it easy to develop loosely coupled and testable code.
+>
+> - **Packaging:**
+>    - Spring Boot applications are typically packaged as JAR (Java Archive) files, which contain all the necessary dependencies. This makes deployment simple, as you can run the application using the `java -jar` command.
+
 ## 配置文件
 
 ### .yaml格式文件
