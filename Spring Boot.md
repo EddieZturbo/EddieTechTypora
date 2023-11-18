@@ -1,600 +1,10 @@
-# Spring Boot Deeply
+# Spring Boot
 
-## Hello Spring Boot
+[Spring Boot](https://spring.io/projects/spring-boot)
 
-## 自动配置原理
-
-SpringBoot**默认会在底层配好所有的组件**。但是如果用户自己配置了以**用户的优先**
-
-虽然我们127个场景的所有自动配置启动的时候默认全部加载。xxxxAutoConfiguration
-按照条件装配规则**（@Conditional），最终会按需配置**
-
-### 依赖管理
-
-```java
-依赖管理    
-<parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.3.4.RELEASE</version>
-</parent>
-
-他的父项目
- <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-dependencies</artifactId>
-    <version>2.3.4.RELEASE</version>
-  </parent>
-
-几乎声明了所有开发中常用的依赖的版本号,自动版本仲裁机制
-    无需关注版本号，自动版本仲裁
-    1、引入依赖默认都可以不写版本
-    2、引入非版本仲裁的jar，要写版本号。
-    
-    
-可以修改默认版本号
-    1、查看spring-boot-dependencies里面规定当前依赖的版本 用的 key。
-    2、在当前项目里面重写配置
-    <properties>
-        <mysql.version>5.1.43</mysql.version>
-    </properties>
-    
-    
-开发导入starter场景启动器--起步依赖
-    1、见到很多 spring-boot-starter-* ： *就某种场景
-    2、只要引入starter，这个场景的所有常规需要的依赖我们都自动引入
-    3、SpringBoot所有支持的场景
-    https://docs.spring.io/spring-boot/docs/current/reference/html/using-spring-boot.html#using-boot-starter
-    4、见到的  *-spring-boot-starter： 第三方为我们提供的简化开发的场景启动器。
-    5、所有场景启动器最底层的依赖
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter</artifactId>
-      <version>2.3.4.RELEASE</version>
-      <scope>compile</scope>
-    </dependency>
-```
-
-![image-20221118094237279](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118094237279.png)
-
-![image-20221118095138455](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118095138455.png)
-
-### 自动配置
-
-- **自动配好Tomcat**
-
-- - 引入Tomcat依赖。
-  - 配置Tomcat
-
-```java
-<dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-tomcat</artifactId>
-      <version>2.3.4.RELEASE</version>
-      <scope>compile</scope>
-    </dependency>
-```
-
-- **自动配好SpringMVC**
-
-- - **引入SpringMVC全套组件**
-  - **自动配好SpringMVC常用组件（功能）**
-
-- 自动配好Web常见功能，如：字符编码问题
-
-- - SpringBoot帮我们配置好了所有web开发的常见场景
-
-- **默认的包结构**
-
-- - **主程序所在包及其下面的所有子包里面的组件都会被默认扫描进来**
-  - 无需以前的包扫描配置
-  - **想要改变扫描路径，@SpringBootApplication(scanBasePackages="com.eddie")**
-
-- ![image-20221118100718091](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118100718091.png)
-
-- - - **或者@ComponentScan 指定扫描路径**
-
-```java
-@SpringBootApplication
-等同于
-@SpringBootConfiguration
-@EnableAutoConfiguration
-@ComponentScan("com.eddie.boot")
-```
-
-![image-20221118100837667](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118100837667.png)
-
-![image-20221118095415107](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118095415107.png)
-
-![image-20221118095627629](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118095627629.png)
-
-- **各种配置拥有默认值**
-
-- - **默认配置**最终都是**映射到某个类上**，如：MultipartProperties
-
-- ![image-20221118101147970](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118101147970.png)
-
-- ![image-20221118101132664](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118101132664.png)
-
-- - **配置文件的值最终会绑定每个类上，这个类会在容器中创建对象**
-
-- **按需加载所有自动配置项**
-
-- - 非常多的starter
-  - **引入了哪些场景这个场景的自动配置才会开启**
-  - SpringBoot所有的自动配置功能都在 spring-boot-autoconfigure 包里面
-
-- ```java
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-autoconfigure</artifactId>
-        <version>2.7.5</version>
-        <scope>compile</scope>
-      </dependency>
-  ```
-
-- 
-
-### 查看Spring Boot为我们自动配置的组件
-
-```java
-@SpringBootApplication
-public class SpringHelloApplication {
-    public static void main(String[] args) {
-        //返回的IOC容器
-        ConfigurableApplicationContext run = SpringApplication.run(SpringHelloApplication.class, args);
-        //获取IOC容器中所有组件的name
-        String[] beanDefinitionNames = run.getBeanDefinitionNames();
-        for (String name :
-                beanDefinitionNames) {
-            System.out.println(name);
-        }
-    }
-}
-```
-
-![image-20221118100245199](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118100245199.png)
-
-### Spring自动配置原理
-
-![image-20221118193315466](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118193315466.png)
-
-![image-20221118192600694](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118192600694.png)
-
-### 按需加载（@Conditional条件装配）
-
-#### @Import(AutoConfigurationImportSelector.class)
-
-```java
-1、利用getAutoConfigurationEntry(annotationMetadata);给容器中批量导入一些组件
-2、调用List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes)获取到所有需要导入到容器中的配置类
-3、利用工厂加载 Map<String, List<String>> loadSpringFactories(@Nullable ClassLoader classLoader)；得到所有的组件
-4、从META-INF/spring.factories位置来加载一个文件。
-	默认扫描我们当前系统里面所有META-INF/spring.factories位置的文件
-    spring-boot-autoconfigure-2.3.4.RELEASE.jar包里面也有META-INF/spring.factories
-    
-```
-
-![image-20221118195405828](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118195405828.png)
-
-#### 按需加载
-
-虽然我们127个场景的所有自动配置启动的时候默认全部加载。xxxxAutoConfiguration
-按照条件装配规则（@Conditional），最终会按需配置。
-
-![image-20221118195201168](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118195201168.png)
-
-### IOC容器功能
-
-#### 组件添加
-
-##### @Configuration|@Bean
-
-**.`@Configuration`配置类是有主次之分的，主配置类是驱动整个程序的入口，可以是一个，也可以是多个（若存在多个，支持使用@Order排序）**
-
-- 基本使用
-- **Full模式与Lite模式**
-
-- - 示例
-  - 最佳实战
-
-- - - 配置 **类组件之间无依赖关系用Lite模式加速容器启动过程**，减少判断并能**提高Spring启动速度**
-    - **配置类组件之间有依赖关系**，方法会被**调用得到之前单实例组件**，**用Full模式**
-
-  - @Configuration（proxyBeanMethods = true）配置类为代理对象 会到IOC容器进行寻找Bean 保证单例Bean
-
-  - Full——>proxyBeanMethods = true单例模式 会到IOC容器中寻找Bean
-
-  - Lite——>proxyBeanMethods = false多例模式
-
-```java
-@Configuration//指明是配置类 配置类也是IOC容器中的组件
-public class MyConfig {
-
-    @Bean//给容器中添加组件 方法名为组件的id(可以通过name属性指定组件的id) 返回类型就是组件的类型 返回的值就是组件
-                            //spring默认的单列Bean
-    public Book myBook(){//组件注册方法
-        return new Book(1,"Information Technology","Eddie Study Java","Persevere");
-    }
-}
-
-@SpringBootApplication
-public class SpringHelloSsm1Application {
-
-    public static void main(String[] args) {
-        ConfigurableApplicationContext run = SpringApplication.run(SpringHelloSsm1Application.class, args);
-        Book javaBean1 = run.getBean("myBook", Book.class);
-        Book javaBean2 = run.getBean("myBook", Book.class);
-        Book javaBean3 = run.getBean("myBook", Book.class);
-        if (javaBean3 == javaBean2 && javaBean2 == javaBean1){
-            System.out.println("myBook is  simple");
-        }
-    }
-
-}
-
-console
-    myBook is  simple
-```
-
-![image-20221118112300368](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118112300368.png)
-
-##### @Component
-
-标识为任意层组件的注解
-
-![image-20221118114221633](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118114221633.png)
-
-```java
-public @Component {
-    String value() default "";
-}
-```
-
-##### @Controller
-
-标识为Controller层的注解
-
-![image-20221118114325489](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118114325489.png)
-
-```java
-public @Controller {
-    @AliasFor(
-        annotation = Component.class
-    )
-    String value() default "";
-}
-```
-
-##### @Service
-
-标识为Service层的注解
-
-![image-20221118114312465](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118114312465.png)
-
-```java
-public @Service {
-    @AliasFor(
-        annotation = Component.class
-    )
-    String value() default "";
-}
-```
-
-##### @Repository
-
-标识为DAO层的注解
-
-![image-20221118114350935](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118114350935.png)
-
-```java
-public @Repository {
-    @AliasFor(
-        annotation = Component.class
-    )
-    String value() default "";
-}
-```
-
-##### @ComponentScan
-
-开启组件扫描并指定组件扫描的包范围的注解
-
-@ComponentScan(basePackages = "com.example")
-
-![image-20221118114040367](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118114040367.png)
-
-##### @Import
-
-@Import（{JdbcConfig.class,SpringMvcConfig.class}）默认在IOC容器中的BeanName为全类名
-
-给容器中自动创建出这两个类型的组件、默认组件的名字就是全类名
-
-**用来导入其他配置类**
-
-![image-20221118131103698](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118131103698.png)
-
-```java
-public @Import {
-    Class<?>[] value();
-}
-```
-
-##### @Conditional
-
-**条件装配**：满足Conditional指定的条件，则进行组件注入
-
-```java
-
-=====================测试条件装配==========================
-@Configuration//告诉SpringBoot这是一个配置类 == 配置文件
-//@ConditionalOnBean(name = "tom")当IOC容器中有name为"tom"的bean时 配置类中的@Bean的配置方法才会生效
-@ConditionalOnMissingBean(name = "tom")//当IOC容器中没有name为"tom"的bean时 配置类中的@Bean的配置方法才会生效
-public class MyConfig {
-
-	
-    @Bean //给容器中添加组件。以方法名作为组件的id。返回类型就是组件类型。返回的值，就是组件在容器中的实例
-    //@ConditionalOnBean(name = "tom")当IOC容器中有name为"tom"的bean时 此@Bean的配置方法才会生效
-    public User user01(){
-        User zhangsan = new User("zhangsan", 18);
-        //user组件依赖了Pet组件
-        zhangsan.setPet(tomcatPet());
-        return zhangsan;
-    }
-
-    @Bean("tom22")
-    public Pet tomcatPet(){
-        return new Pet("tomcat");
-    }
-}
-
-public static void main(String[] args) {
-        //1、返回我们IOC容器
-        ConfigurableApplicationContext run = SpringApplication.run(MainApplication.class, args);
-
-        //2、查看容器里面的组件
-        String[] names = run.getBeanDefinitionNames();
-        for (String name : names) {
-            System.out.println(name);
-        }
-
-        boolean tom = run.containsBean("tom");
-        System.out.println("容器中Tom组件："+tom);
-
-        boolean user01 = run.containsBean("user01");
-        System.out.println("容器中user01组件："+user01);
-
-        boolean tom22 = run.containsBean("tom22");
-        System.out.println("容器中tom22组件："+tom22);
-
-
-    }
-```
-
-![image-20221118130304008](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118130304008.png)
-
-#### 配置文件引入
-
-##### @ImportResource("classpath:配置文件名")
-
-引入xml等配置文件
-
-```java
-@ImportResource("classpath:beans.xml")
-public class MyConfig {}
-
-======================测试=================
-        boolean haha = run.containsBean("haha");
-        boolean hehe = run.containsBean("hehe");
-        System.out.println("haha："+haha);//true
-        System.out.println("hehe："+hehe);//true
-```
-
-
-
-```xml
-
-======================beans.xml=========================
-<?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
-
-    <bean id="haha" class="com.atguigu.boot.bean.User">
-        <property name="name" value="zhangsan"></property>
-        <property name="age" value="18"></property>
-    </bean>
-
-    <bean id="hehe" class="com.atguigu.boot.bean.Pet">
-        <property name="name" value="tomcat"></property>
-    </bean>
-</beans>
-```
-
-#### 配置绑定（读取配置内容封装成实体类对象）
-
-##### 引入依赖
-
-```xml
-<dependency>
-	<groupId>org.springframework.boot</groupId>
-	<artifactId>spring-boot-configuration-processor</artifactId>
-	<optional>true</optional>
-</dependency>
-```
-
-**确保实体类作为IOC容器中的组件** @Component或者@EnableConfigurationProperties（实体类.class）开启实体类的属性绑定功能
-
-**将配置文件中的内容读取**并且**封装成Java实体对象**以**供后续使用**
-
-##### 方式一@Component+@ConfigurationProperties
-
-```java
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Component
-@ConfigurationProperties(prefix = "user")//指定前缀
-public class User {//需要提供get和set方法
-    private String username;
-    private Integer age;
-    private char gender;
-}
-```
-
-```yaml
-user:
-  username: EddieZhang
-  age: 21
-  gender: 男
-```
-
-![image-20221118185924766](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118185924766.png)
-
-![image-20221118185905550](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118185905550.png)
-
-##### 方式二@EnableConfigurationProperties+@ConfigurationProperties
-
-![image-20221118190541939](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118190541939.png)
-
-![image-20221118190553453](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118190553453.png)
-
-![image-20221118190601920](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118190601920.png)
-
-![image-20230131182755492](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20230131182755492.png)
-
-
-
-![image-20221118185905550](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118185905550.png)
-
-### 使用CommandLineRunner
-
-**容器加载后**   **项目启动前**调用CommandLineRunner接口的run方法
-
-![image-20221120235927335](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221120235927335.png)
-
-![image-20221121000131841](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121000131841.png)
-
-![image-20221121000949904](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121000949904.png)
-
-
-
-### 修改默认配置
-
-```java
-        @Bean
-		@ConditionalOnBean(MultipartResolver.class)  //容器中有这个类型组件
-		@ConditionalOnMissingBean(name = DispatcherServlet.MULTIPART_RESOLVER_BEAN_NAME) //容器中没这个名字 multipartResolver 的组件
-		public MultipartResolver multipartResolver(MultipartResolver resolver) {
-            //给@Bean标注的方法传入了对象参数，这个参数的值就会从容器中找。
-            //SpringMVC multipartResolver。防止有些用户配置的文件上传解析器不符合规范
-			// Detect if the user has created a MultipartResolver but named it incorrectly
-			return resolver;
-		}
-        给容器中加入了文件上传解析器；
-```
-
-SpringBoot默认会在底层配好所有的组件。但是如果用户自己配置了以**用户的优先**
-
-自己@Bean注册一个组件到容器中 SpringBoot会以用户的为准
-
-```java
-    @Bean
-	@ConditionalOnMissingBean
-	public CharacterEncodingFilter characterEncodingFilter() {
-    }
-```
-
-### 总结
-
-总结：
-
-- SpringBoot**先加载所有的自动配置类**  xxxxxAutoConfiguration
-- 每个自动配置类**按照条件进行生效**，**默认都会绑定配置文件**指定的值。xxxxProperties里面拿。**xxxProperties和配置文件进行了绑定**
-- 生效的配置类就会给容器中装配很多组件
-- 只要容器中有这些组件，相当于这些功能就有了
-- 定制化配置
-
-- - 用户直接自己**@Bean替换底层的组件**
-  - 用户去看这个组件是获取的**配置文件**什么值就去**修改**。
-
-**xxxxxAutoConfiguration ---> 组件  --->** **xxxxProperties里面拿值  ----> application.properties**
-
-### 最佳实践
-
-- 引入场景依赖
-
-- - https://docs.spring.io/spring-boot/docs/current/reference/html/using-spring-boot.html#using-boot-starter
-
-- 查看自动配置了哪些（选做）
-
-- - 自己分析，引入场景对应的自动配置一般都生效了
-  - 配置文件中debug=true开启自动配置报告。Negative（不生效）\Positive（生效）
-
-- 是否需要修改
-
-- - 参照文档修改配置项
-
-- - - https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html#common-application-properties
-    - 自己分析。xxxxProperties绑定了配置文件的哪些。
-
-- - 自定义加入或者替换组件
-
-- - - @Bean、@Component。。。
-
-- - 自定义器  **XXXXXCustomizer**；
-  - ......
-
-### 使用容器
-
-![image-20221120234910779](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221120234910779.png)
-
-![image-20221120235032509](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221120235032509.png)
-
-![image-20221120234936825](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221120234936825.png)
-
-![image-20221120234946229](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221120234946229.png)
-
-## Lombok
-
-### 简化domain开发
-
-![image-20221118223930965](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118223930965.png)
-
-![image-20221118223916959](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118223916959.png)
-
-![image-20221111095900057](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221111095900057.png)
-
-![image-20221118224021282](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118224021282.png)
-
-### @Slf4j日志
-
-![image-20221118224249140](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118224249140.png)
-
-![image-20221118224508000](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118224508000.png)
-
-![image-20221118224457296](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118224457296.png)
-
-## Dev-Tools
-
-热更新
-
-ctrl+F9
-
-![image-20221118225154707](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118225154707.png)
-
-![image-20221118224724053](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118224724053.png)
-
-|      |      |
-| ---- | ---- |
-|      |      |
-|      |      |
-|      |      |
+![image-20221120230430368](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221120230430368.png)
 
 ## 配置文件
-
-application.properties > application.yml > application.yaml
 
 ### .yaml格式文件
 
@@ -714,6 +124,42 @@ k:
 >    2. application.properties
 >    3. application.yml
 > 4. **`application-{profile}.properties`或`application-{profile}.yml`文件：** 如果你使用了Spring的配置文件激活功能（比如`spring.profiles.active`属性），那么根据当前激活的配置文件，Spring Boot会加载对应的profile配置文件。例如，如果激活了"dev"配置文件，将加载`application-dev.properties`或`application-dev.yml`文件。
+
+## Lombok
+
+### 简化domain开发
+
+![image-20221118223930965](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118223930965.png)
+
+![image-20221118223916959](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118223916959.png)
+
+![image-20221111095900057](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221111095900057.png)
+
+![image-20221118224021282](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118224021282.png)
+
+### @Slf4j日志
+
+![image-20221118224249140](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118224249140.png)
+
+![image-20221118224508000](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118224508000.png)
+
+![image-20221118224457296](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118224457296.png)
+
+## Dev-Tools
+
+热更新
+
+ctrl+F9
+
+![image-20221118225154707](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118225154707.png)
+
+![image-20221118224724053](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118224724053.png)
+
+|      |      |
+| ---- | ---- |
+|      |      |
+|      |      |
+|      |      |
 
 ## Web开发
 
@@ -1058,14 +504,6 @@ SpringMVC目标方法能写多少种参数类型。取决于参数解析器
 **返回值处理器**
 
 ![image-20221119193413441](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221119193413441.png)
-
-# Spring Boot
-
-[Spring Boot](https://spring.io/projects/spring-boot)
-
-![image-20221120230430368](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221120230430368.png)
-
-
 
 ## Web组件
 
@@ -1860,3 +1298,593 @@ https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html
 | @ConditionalOnClass                                     |      |
 | @ConditionalOnMisssingClass({ApplicationManager.class}) |      |
 | @ConditionOnMissingBean(name = "example")               |      |
+
+# Spring Boot Deeply
+
+## 自动配置原理
+
+SpringBoot**默认会在底层配好所有的组件**。但是如果用户自己配置了以**用户的优先**
+
+虽然我们127个场景的所有自动配置启动的时候默认全部加载。xxxxAutoConfiguration
+按照条件装配规则**（@Conditional），最终会按需配置**
+
+### 依赖管理
+
+```java
+依赖管理    
+<parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.4.RELEASE</version>
+</parent>
+
+他的父项目
+ <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-dependencies</artifactId>
+    <version>2.3.4.RELEASE</version>
+  </parent>
+
+几乎声明了所有开发中常用的依赖的版本号,自动版本仲裁机制
+    无需关注版本号，自动版本仲裁
+    1、引入依赖默认都可以不写版本
+    2、引入非版本仲裁的jar，要写版本号。
+    
+    
+可以修改默认版本号
+    1、查看spring-boot-dependencies里面规定当前依赖的版本 用的 key。
+    2、在当前项目里面重写配置
+    <properties>
+        <mysql.version>5.1.43</mysql.version>
+    </properties>
+    
+    
+开发导入starter场景启动器--起步依赖
+    1、见到很多 spring-boot-starter-* ： *就某种场景
+    2、只要引入starter，这个场景的所有常规需要的依赖我们都自动引入
+    3、SpringBoot所有支持的场景
+    https://docs.spring.io/spring-boot/docs/current/reference/html/using-spring-boot.html#using-boot-starter
+    4、见到的  *-spring-boot-starter： 第三方为我们提供的简化开发的场景启动器。
+    5、所有场景启动器最底层的依赖
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+      <version>2.3.4.RELEASE</version>
+      <scope>compile</scope>
+    </dependency>
+```
+
+![image-20221118094237279](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118094237279.png)
+
+![image-20221118095138455](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118095138455.png)
+
+### 自动配置
+
+- **自动配好Tomcat**
+
+- - 引入Tomcat依赖。
+  - 配置Tomcat
+
+```java
+<dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-tomcat</artifactId>
+      <version>2.3.4.RELEASE</version>
+      <scope>compile</scope>
+    </dependency>
+```
+
+- **自动配好SpringMVC**
+
+- - **引入SpringMVC全套组件**
+  - **自动配好SpringMVC常用组件（功能）**
+
+- 自动配好Web常见功能，如：字符编码问题
+
+- - SpringBoot帮我们配置好了所有web开发的常见场景
+
+- **默认的包结构**
+
+- - **主程序所在包及其下面的所有子包里面的组件都会被默认扫描进来**
+  - 无需以前的包扫描配置
+  - **想要改变扫描路径，@SpringBootApplication(scanBasePackages="com.eddie")**
+
+- ![image-20221118100718091](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118100718091.png)
+
+- - - **或者@ComponentScan 指定扫描路径**
+
+```java
+@SpringBootApplication
+等同于
+@SpringBootConfiguration
+@EnableAutoConfiguration
+@ComponentScan("com.eddie.boot")
+```
+
+![image-20221118100837667](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118100837667.png)
+
+![image-20221118095415107](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118095415107.png)
+
+![image-20221118095627629](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118095627629.png)
+
+- **各种配置拥有默认值**
+
+- - **默认配置**最终都是**映射到某个类上**，如：MultipartProperties
+
+- ![image-20221118101147970](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118101147970.png)
+
+- ![image-20221118101132664](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118101132664.png)
+
+- - **配置文件的值最终会绑定每个类上，这个类会在容器中创建对象**
+
+- **按需加载所有自动配置项**
+
+- - 非常多的starter
+  - **引入了哪些场景这个场景的自动配置才会开启**
+  - SpringBoot所有的自动配置功能都在 spring-boot-autoconfigure 包里面
+
+- ```java
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-autoconfigure</artifactId>
+        <version>2.7.5</version>
+        <scope>compile</scope>
+      </dependency>
+  ```
+
+- 
+
+### 查看Spring Boot为我们自动配置的组件
+
+```java
+@SpringBootApplication
+public class SpringHelloApplication {
+    public static void main(String[] args) {
+        //返回的IOC容器
+        ConfigurableApplicationContext run = SpringApplication.run(SpringHelloApplication.class, args);
+        //获取IOC容器中所有组件的name
+        String[] beanDefinitionNames = run.getBeanDefinitionNames();
+        for (String name :
+                beanDefinitionNames) {
+            System.out.println(name);
+        }
+    }
+}
+```
+
+![image-20221118100245199](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118100245199.png)
+
+### Spring自动配置原理
+
+![image-20221118193315466](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118193315466.png)
+
+![image-20221118192600694](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118192600694.png)
+
+### 按需加载（@Conditional条件装配）
+
+#### @Import(AutoConfigurationImportSelector.class)
+
+```java
+1、利用getAutoConfigurationEntry(annotationMetadata);给容器中批量导入一些组件
+2、调用List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes)获取到所有需要导入到容器中的配置类
+3、利用工厂加载 Map<String, List<String>> loadSpringFactories(@Nullable ClassLoader classLoader)；得到所有的组件
+4、从META-INF/spring.factories位置来加载一个文件。
+	默认扫描我们当前系统里面所有META-INF/spring.factories位置的文件
+    spring-boot-autoconfigure-2.3.4.RELEASE.jar包里面也有META-INF/spring.factories
+    
+```
+
+![image-20221118195405828](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118195405828.png)
+
+#### 按需加载
+
+虽然我们127个场景的所有自动配置启动的时候默认全部加载。xxxxAutoConfiguration
+按照条件装配规则（@Conditional），最终会按需配置。
+
+![image-20221118195201168](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118195201168.png)
+
+### IOC容器功能
+
+#### 组件添加
+
+##### @Configuration|@Bean
+
+**.`@Configuration`配置类是有主次之分的，主配置类是驱动整个程序的入口，可以是一个，也可以是多个（若存在多个，支持使用@Order排序）**
+
+- 基本使用
+- **Full模式与Lite模式**
+
+- - 示例
+  - 最佳实战
+
+- - - 配置 **类组件之间无依赖关系用Lite模式加速容器启动过程**，减少判断并能**提高Spring启动速度**
+    - **配置类组件之间有依赖关系**，方法会被**调用得到之前单实例组件**，**用Full模式**
+
+  - @Configuration（proxyBeanMethods = true）配置类为代理对象 会到IOC容器进行寻找Bean 保证单例Bean
+
+  - Full——>proxyBeanMethods = true单例模式 会到IOC容器中寻找Bean
+
+  - Lite——>proxyBeanMethods = false多例模式
+
+```java
+@Configuration//指明是配置类 配置类也是IOC容器中的组件
+public class MyConfig {
+
+    @Bean//给容器中添加组件 方法名为组件的id(可以通过name属性指定组件的id) 返回类型就是组件的类型 返回的值就是组件
+                            //spring默认的单列Bean
+    public Book myBook(){//组件注册方法
+        return new Book(1,"Information Technology","Eddie Study Java","Persevere");
+    }
+}
+
+@SpringBootApplication
+public class SpringHelloSsm1Application {
+
+    public static void main(String[] args) {
+        ConfigurableApplicationContext run = SpringApplication.run(SpringHelloSsm1Application.class, args);
+        Book javaBean1 = run.getBean("myBook", Book.class);
+        Book javaBean2 = run.getBean("myBook", Book.class);
+        Book javaBean3 = run.getBean("myBook", Book.class);
+        if (javaBean3 == javaBean2 && javaBean2 == javaBean1){
+            System.out.println("myBook is  simple");
+        }
+    }
+
+}
+
+console
+    myBook is  simple
+```
+
+![image-20221118112300368](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118112300368.png)
+
+##### @Component
+
+标识为任意层组件的注解
+
+![image-20221118114221633](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118114221633.png)
+
+```java
+public @Component {
+    String value() default "";
+}
+```
+
+##### @Controller
+
+标识为Controller层的注解
+
+![image-20221118114325489](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118114325489.png)
+
+```java
+public @Controller {
+    @AliasFor(
+        annotation = Component.class
+    )
+    String value() default "";
+}
+```
+
+##### @Service
+
+标识为Service层的注解
+
+![image-20221118114312465](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118114312465.png)
+
+```java
+public @Service {
+    @AliasFor(
+        annotation = Component.class
+    )
+    String value() default "";
+}
+```
+
+##### @Repository
+
+标识为DAO层的注解
+
+![image-20221118114350935](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118114350935.png)
+
+```java
+public @Repository {
+    @AliasFor(
+        annotation = Component.class
+    )
+    String value() default "";
+}
+```
+
+##### @ComponentScan
+
+开启组件扫描并指定组件扫描的包范围的注解
+
+@ComponentScan(basePackages = "com.example")
+
+![image-20221118114040367](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118114040367.png)
+
+##### @Import
+
+@Import（{JdbcConfig.class,SpringMvcConfig.class}）默认在IOC容器中的BeanName为全类名
+
+给容器中自动创建出这两个类型的组件、默认组件的名字就是全类名
+
+**用来导入其他配置类**
+
+![image-20221118131103698](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118131103698.png)
+
+```java
+public @Import {
+    Class<?>[] value();
+}
+```
+
+##### @Conditional
+
+**条件装配**：满足Conditional指定的条件，则进行组件注入
+
+```java
+
+=====================测试条件装配==========================
+@Configuration//告诉SpringBoot这是一个配置类 == 配置文件
+//@ConditionalOnBean(name = "tom")当IOC容器中有name为"tom"的bean时 配置类中的@Bean的配置方法才会生效
+@ConditionalOnMissingBean(name = "tom")//当IOC容器中没有name为"tom"的bean时 配置类中的@Bean的配置方法才会生效
+public class MyConfig {
+
+	
+    @Bean //给容器中添加组件。以方法名作为组件的id。返回类型就是组件类型。返回的值，就是组件在容器中的实例
+    //@ConditionalOnBean(name = "tom")当IOC容器中有name为"tom"的bean时 此@Bean的配置方法才会生效
+    public User user01(){
+        User zhangsan = new User("zhangsan", 18);
+        //user组件依赖了Pet组件
+        zhangsan.setPet(tomcatPet());
+        return zhangsan;
+    }
+
+    @Bean("tom22")
+    public Pet tomcatPet(){
+        return new Pet("tomcat");
+    }
+}
+
+public static void main(String[] args) {
+        //1、返回我们IOC容器
+        ConfigurableApplicationContext run = SpringApplication.run(MainApplication.class, args);
+
+        //2、查看容器里面的组件
+        String[] names = run.getBeanDefinitionNames();
+        for (String name : names) {
+            System.out.println(name);
+        }
+
+        boolean tom = run.containsBean("tom");
+        System.out.println("容器中Tom组件："+tom);
+
+        boolean user01 = run.containsBean("user01");
+        System.out.println("容器中user01组件："+user01);
+
+        boolean tom22 = run.containsBean("tom22");
+        System.out.println("容器中tom22组件："+tom22);
+
+
+    }
+```
+
+![image-20221118130304008](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118130304008.png)
+
+#### 配置文件引入
+
+##### @ImportResource("classpath:配置文件名")
+
+引入xml等配置文件
+
+```java
+@ImportResource("classpath:beans.xml")
+public class MyConfig {}
+
+======================测试=================
+        boolean haha = run.containsBean("haha");
+        boolean hehe = run.containsBean("hehe");
+        System.out.println("haha："+haha);//true
+        System.out.println("hehe："+hehe);//true
+```
+
+
+
+```xml
+
+======================beans.xml=========================
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <bean id="haha" class="com.atguigu.boot.bean.User">
+        <property name="name" value="zhangsan"></property>
+        <property name="age" value="18"></property>
+    </bean>
+
+    <bean id="hehe" class="com.atguigu.boot.bean.Pet">
+        <property name="name" value="tomcat"></property>
+    </bean>
+</beans>
+```
+
+#### 配置绑定（读取配置内容封装成实体类对象）
+
+##### 引入依赖
+
+```xml
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-configuration-processor</artifactId>
+	<optional>true</optional>
+</dependency>
+```
+
+**确保实体类作为IOC容器中的组件** @Component或者@EnableConfigurationProperties（实体类.class）开启实体类的属性绑定功能
+
+**将配置文件中的内容读取**并且**封装成Java实体对象**以**供后续使用**
+
+##### 方式一@Component+@ConfigurationProperties
+
+```java
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Component
+@ConfigurationProperties(prefix = "user")//指定前缀
+public class User {//需要提供get和set方法
+    private String username;
+    private Integer age;
+    private char gender;
+}
+```
+
+```yaml
+user:
+  username: EddieZhang
+  age: 21
+  gender: 男
+```
+
+![image-20221118185924766](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118185924766.png)
+
+![image-20221118185905550](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118185905550.png)
+
+##### 方式二@EnableConfigurationProperties+@ConfigurationProperties
+
+![image-20221118190541939](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118190541939.png)
+
+![image-20221118190553453](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118190553453.png)
+
+![image-20221118190601920](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118190601920.png)
+
+![image-20230131182755492](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20230131182755492.png)
+
+
+
+![image-20221118185905550](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118185905550.png)
+
+### 使用CommandLineRunner
+
+**容器加载后**   **项目启动前**调用CommandLineRunner接口的run方法
+
+![image-20221120235927335](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221120235927335.png)
+
+![image-20221121000131841](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121000131841.png)
+
+![image-20221121000949904](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121000949904.png)
+
+
+
+### 修改默认配置
+
+```java
+        @Bean
+		@ConditionalOnBean(MultipartResolver.class)  //容器中有这个类型组件
+		@ConditionalOnMissingBean(name = DispatcherServlet.MULTIPART_RESOLVER_BEAN_NAME) //容器中没这个名字 multipartResolver 的组件
+		public MultipartResolver multipartResolver(MultipartResolver resolver) {
+            //给@Bean标注的方法传入了对象参数，这个参数的值就会从容器中找。
+            //SpringMVC multipartResolver。防止有些用户配置的文件上传解析器不符合规范
+			// Detect if the user has created a MultipartResolver but named it incorrectly
+			return resolver;
+		}
+        给容器中加入了文件上传解析器；
+```
+
+SpringBoot默认会在底层配好所有的组件。但是如果用户自己配置了以**用户的优先**
+
+自己@Bean注册一个组件到容器中 SpringBoot会以用户的为准
+
+```java
+    @Bean
+	@ConditionalOnMissingBean
+	public CharacterEncodingFilter characterEncodingFilter() {
+    }
+```
+
+### 总结
+
+总结：
+
+- SpringBoot**先加载所有的自动配置类**  xxxxxAutoConfiguration
+- 每个自动配置类**按照条件进行生效**，**默认都会绑定配置文件**指定的值。xxxxProperties里面拿。**xxxProperties和配置文件进行了绑定**
+- 生效的配置类就会给容器中装配很多组件
+- 只要容器中有这些组件，相当于这些功能就有了
+- 定制化配置
+
+- - 用户直接自己**@Bean替换底层的组件**
+  - 用户去看这个组件是获取的**配置文件**什么值就去**修改**。
+
+**xxxxxAutoConfiguration ---> 组件  --->** **xxxxProperties里面拿值  ----> application.properties**
+
+### 最佳实践
+
+- 引入场景依赖
+
+- - https://docs.spring.io/spring-boot/docs/current/reference/html/using-spring-boot.html#using-boot-starter
+
+- 查看自动配置了哪些（选做）
+
+- - 自己分析，引入场景对应的自动配置一般都生效了
+  - 配置文件中debug=true开启自动配置报告。Negative（不生效）\Positive（生效）
+
+- 是否需要修改
+
+- - 参照文档修改配置项
+
+- - - https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-application-properties.html#common-application-properties
+    - 自己分析。xxxxProperties绑定了配置文件的哪些。
+
+- - 自定义加入或者替换组件
+
+- - - @Bean、@Component。。。
+
+- - 自定义器  **XXXXXCustomizer**；
+  - ......
+
+### 使用容器
+
+![image-20221120234910779](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221120234910779.png)
+
+![image-20221120235032509](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221120235032509.png)
+
+![image-20221120234936825](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221120234936825.png)
+
+![image-20221120234946229](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221120234946229.png)
+
+## Spring Boot Design Patterns
+
+> - **单例模式（Singleton）：**
+>    - **描述：** 保证一个类只有一个实例，并提供一个全局访问点。
+>    - **Spring Boot 示例：** Spring容器管理的Bean默认是单例的，通过`@Service`、`@Component`等注解创建的服务都是单例的。
+>
+> - **工厂模式（Factory）：**
+>    - **描述：** 定义一个接口用于创建对象，但由子类决定要实例化的类是哪一个。
+>    - **Spring Boot 示例：** `@Bean`注解用于声明一个工厂方法，告诉Spring容器如何创建和配置Bean。
+>
+> - **观察者模式（Observer）：**
+>    - **描述：** 定义对象间的一对多依赖关系，当一个对象状态改变时，所有依赖它的对象都得到通知并被自动更新。
+>    - **Spring Boot 示例：** Spring事件机制，如使用`@EventListener`注解监听应用中的事件。
+>
+> - **代理模式（Proxy）：**
+>    - **描述：** 为其他对象提供一种代理以控制对这个对象的访问。
+>    - **Spring Boot 示例：** Spring AOP通过代理机制实现横切关注点的织入，如事务管理和日志记录。
+>
+> - **策略模式（Strategy）：**
+>    - **描述：** 定义一系列算法，将每个算法封装起来，并使它们可以相互替换。
+>    - **Spring Boot 示例：** Spring中的`RestTemplate`，可以根据需要选择不同的`ClientHttpRequestFactory`策略来处理HTTP请求。
+>
+> - **模板方法模式（Template Method）：**
+>    - **描述：** 定义一个操作中的算法的骨架，而将一些步骤延迟到子类中。
+>    - **Spring Boot 示例：** Spring中的`JdbcTemplate`，其中的查询和更新方法是模板方法，而实际的实现留给了子类。
+>
+> - **适配器模式（Adapter）：**
+>    - **描述：** 将一个类的接口转换成客户希望的另一个接口。
+>    - **Spring Boot 示例：** Spring的`HandlerAdapter`将`@Controller`的方法适配成`Handler`接口。
+>
+> - **装饰器模式（Decorator）：**
+>    - **描述：** 动态地给一个对象添加一些额外的职责，就增加功能而言，装饰模式比生成子类更为灵活。
+>    - **Spring Boot 示例：** Spring中的`@Transactional`注解通过AOP装饰方法，实现事务管理。

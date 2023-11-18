@@ -1109,7 +1109,29 @@ AOP为Aspect Oriented Programming的缩写，意为：**面向切面编程**
 
 ### Spring AOP 和 AspectJ AOP 区别
 
-**Spring AOP 属于运行时增强，而 AspectJ 是编译时增强。** Spring AOP 基于代理(Proxying)，而 AspectJ 基于字节码操作(Bytecode Manipulation)。
+> **Spring AOP 属于运行时增强，而 AspectJ 是编译时增强。** Spring AOP 基于代理(Proxying)，而 AspectJ 基于字节码操作(Bytecode Manipulation)。
+>
+> - **Spring AOP**
+>
+>   https://www.springcloud.io/post/2022-01/springboot-aop/#gsc.tab=0
+>
+>   (If the proxy object implements the interface, use the JDK dynamic proxy. else it is a direct Cglib dynamic proxy.) 
+>
+>   **starting with Spring Boot 2.0, if the user does not configure anything, the Cglib proxy is used by default.**
+>
+>   - JDK Dynamic proxy can only proxy **by interface** (so your target class needs to implement an interface, which is then also implemented by the proxy class).
+>   - CGLIB (and javassist) can create a proxy **by subclassing**. In this scenario the proxy becomes a subclass of the target class. No need for interfaces.
+>
+>   | No.  |       Key       |                      JDK dynamic proxy                       |                  CGLIB proxy                  |
+>   | :--: | :-------------: | :----------------------------------------------------------: | :-------------------------------------------: |
+>   |  1   | impl interface? | It can be only proxy by interface so target class needs to implement interface |      It can create proxy by subclassing       |
+>   |  2   |     Package     |                It is available with the Java                 |            It is a third  library.            |
+>   |  3   |   Performance   |              It is a bit slow than CGLIB proxy               |      It is faster than JDK dynamic proxy      |
+>   |  4.  |      Final      |        Final class and Final method can not be proxy         | Final class and Final method can not be proxy |
+>
+> - **AspectJ**
+
+
 
 Spring AOP 已经集成了 AspectJ ，AspectJ 应该算的上是 Java 生态系统中最完整的 AOP 框架了。AspectJ 相比于 Spring AOP 功能更加强大，但是 Spring AOP 相对来说更简单，
 
