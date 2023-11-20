@@ -6,7 +6,7 @@
 
 ## Concepts
 
-> - **Convention over Configuration:**
+> - :yellow_heart:**Convention over Configuration:**:yellow_heart:
 >    - Spring Boot follows the principle of "convention over configuration." This means that it provides sensible defaults and conventions, reducing the need for extensive configuration files.
 >
 > - **Spring Boot Initializer:**
@@ -33,9 +33,27 @@
 > - **Packaging:**
 >    - Spring Boot applications are typically packaged as JAR (Java Archive) files, which contain all the necessary dependencies. This makes deployment simple, as you can run the application using the `java -jar` command.
 
-## 配置文件
 
-### .yaml格式文件
+## Web Dev
+
+### Configuration file
+
+#### 配置文件优先级
+
+> 1. **命令行参数（Command Line Arguments）：** 命令行参数具有最高优先级。你可以在启动Spring Boot应用程序时使用`--property=value`的形式传递命令行参数，它们会覆盖所有其他配置。
+> 2. **来自`SpringApplication.setDefaultProperties`的默认属性（Default Properties）：** Spring Boot允许你在`SpringApplication`中设置默认属性，这些属性将作为默认值加载。这些默认属性具有比`application.properties`和`application.yml`更高的优先级。
+> 3. **`bootstrap.properties`或`application.properties`或`application.yml`文件：** 这是标准的应用程序配置文件。你可以在这里定义应用程序的配置属性。如果存在多个配置文件，后加载的文件会覆盖前面加载的同名属性。
+>    1. bootstrap.properties
+>    2. application.properties
+>    3. application.yml
+> 4. **`application-{profile}.properties`或`application-{profile}.yml`文件：** 如果你使用了Spring的配置文件激活功能（比如`spring.profiles.active`属性），那么根据当前激活的配置文件，Spring Boot会加载对应的profile配置文件。例如，如果激活了"dev"配置文件，将加载`application-dev.properties`或`application-dev.yml`文件。
+
+#### 多环境配置
+
+![image-20221120234428578](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221120234428578.png)
+
+
+#### .yaml格式文件
 
 核心规则：**数据前**面要**加空格与冒号隔开**
 
@@ -59,7 +77,7 @@ YAML 文件扩展名：
 
 .yaml
 
-#### 基本语法
+##### 基本语法
 
 - key: value；kv之间有空格
 - 大小写敏感
@@ -69,7 +87,7 @@ YAML 文件扩展名：
 - '#'表示注释
 - 字符串无需加引号，如果要加，''与""表示字符串内容 会被 转义/不转义
 
-#### 数据类型
+##### 数据类型
 
 - 字面量：单个的、不可再分的值。date、boolean、string、number、null
 
@@ -98,6 +116,14 @@ k:
  - v2
  - v3
 ```
+
+
+#### properties文件
+
+![image-20221118231400615](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118231400615.png)
+
+![image-20221118231333469](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118231333469.png)
+
 
 #### 配置提示
 
@@ -131,68 +157,54 @@ k:
         </plugins>
     </build>
 ```
-
 ![image-20221118231624133](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118231624133.png)
 
-### properties文件
 
-![image-20221118231400615](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118231400615.png)
+### Default conf & Principles
 
-![image-20221118231333469](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118231333469.png)
+#### 欢迎页面
 
-### 多环境配置
+- 静态资源路径下  index.html
 
-![image-20221120234428578](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221120234428578.png)
+- - 可以配置静态资源路径
+  - 但是**不可以配置静态资源的访问前缀**。否则**导致 index.html不能被默认访问**
 
-### 配置文件优先级
+![image-20221119000456276](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221119000456276.png)
 
-> 1. **命令行参数（Command Line Arguments）：** 命令行参数具有最高优先级。你可以在启动Spring Boot应用程序时使用`--property=value`的形式传递命令行参数，它们会覆盖所有其他配置。
-> 2. **来自`SpringApplication.setDefaultProperties`的默认属性（Default Properties）：** Spring Boot允许你在`SpringApplication`中设置默认属性，这些属性将作为默认值加载。这些默认属性具有比`application.properties`和`application.yml`更高的优先级。
-> 3. **`application.properties`或`application.yml`文件：** 这是标准的应用程序配置文件。你可以在这里定义应用程序的配置属性。如果存在多个配置文件，后加载的文件会覆盖前面加载的同名属性。
->    1. bootstrap.properties
->    2. application.properties
->    3. application.yml
-> 4. **`application-{profile}.properties`或`application-{profile}.yml`文件：** 如果你使用了Spring的配置文件激活功能（比如`spring.profiles.active`属性），那么根据当前激活的配置文件，Spring Boot会加载对应的profile配置文件。例如，如果激活了"dev"配置文件，将加载`application-dev.properties`或`application-dev.yml`文件。
+#### 欢迎页的处理规则
 
-## Lombok
+```java
+HandlerMapping：处理器映射。保存了每一个Handler能处理哪些请求。	
 
-### 简化domain开发
+    @Bean
+	public WelcomePageHandlerMapping welcomePageHandlerMapping(ApplicationContext applicationContext,
+			FormattingConversionService mvcConversionService, ResourceUrlProvider mvcResourceUrlProvider) {
+		WelcomePageHandlerMapping welcomePageHandlerMapping = new WelcomePageHandlerMapping(
+				new TemplateAvailabilityProviders(applicationContext), applicationContext, getWelcomePage(),
+				this.mvcProperties.getStaticPathPattern());
+		welcomePageHandlerMapping.setInterceptors(getInterceptors(mvcConversionService, mvcResourceUrlProvider));
+		welcomePageHandlerMapping.setCorsConfigurations(getCorsConfigurations());
+		return welcomePageHandlerMapping;
+	}
 
-![image-20221118223930965](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118223930965.png)
+WelcomePageHandlerMapping(TemplateAvailabilityProviders templateAvailabilityProviders,
+		ApplicationContext applicationContext, Optional<Resource> welcomePage, String staticPathPattern) {
+	if (welcomePage.isPresent() && "/**".equals(staticPathPattern)) {
+        //要用欢迎页功能，必须是/**
+		logger.info("Adding welcome page: " + welcomePage.get());
+		setRootViewName("forward:index.html");
+	}
+	else if (welcomeTemplateExists(templateAvailabilityProviders, applicationContext)) {
+        // 调用Controller  /index
+		logger.info("Adding welcome page template: index");
+		setRootViewName("index");
+	}
+}
+```
 
-![image-20221118223916959](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118223916959.png)
+![image-20221119110827085](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221119110827085.png)
 
-![image-20221111095900057](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221111095900057.png)
-
-![image-20221118224021282](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118224021282.png)
-
-### @Slf4j日志
-
-![image-20221118224249140](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118224249140.png)
-
-![image-20221118224508000](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118224508000.png)
-
-![image-20221118224457296](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118224457296.png)
-
-## Dev-Tools
-
-热更新
-
-ctrl+F9
-
-![image-20221118225154707](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118225154707.png)
-
-![image-20221118224724053](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118224724053.png)
-
-|      |      |
-| ---- | ---- |
-|      |      |
-|      |      |
-|      |      |
-
-## Web开发
-
-### 静态资源访问
+#### 静态资源访问
 
 原理： 静态映射/**。
 
@@ -241,16 +253,8 @@ https://www.webjars.org/
 
 访问地址：[http://localhost:8080/webjars/**jquery/3.5.1/jquery.js**](http://localhost:8080/webjars/jquery/3.5.1/jquery.js)   后面地址要按照依赖里面的包路径
 
-### 欢迎页面
 
-- 静态资源路径下  index.html
-
-- - 可以配置静态资源路径
-  - 但是**不可以配置静态资源的访问前缀**。否则**导致 index.html不能被默认访问**
-
-![image-20221119000456276](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221119000456276.png)
-
-### 自定义 `Favicon`
+#### 自定义 `Favicon`
 
 图标
 
@@ -264,7 +268,7 @@ favicon.ico 放在静态资源目录下即可 同时Browser禁用缓存
 
 ![image-20221119001327388](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221119001327388.png)
 
-### 静态资源配置原理
+#### 静态资源配置原理
 
 - SpringBoot启动默认加载  xxxAutoConfiguration 类（自动配置类）
 - SpringMVC功能的自动配置类 WebMvcAutoConfiguration，生效
@@ -346,40 +350,6 @@ public static class Resources {
 
 ![image-20221119105017981](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221119105017981.png)
 
-#### 欢迎页的处理规则
-
-```java
-HandlerMapping：处理器映射。保存了每一个Handler能处理哪些请求。	
-
-    @Bean
-	public WelcomePageHandlerMapping welcomePageHandlerMapping(ApplicationContext applicationContext,
-			FormattingConversionService mvcConversionService, ResourceUrlProvider mvcResourceUrlProvider) {
-		WelcomePageHandlerMapping welcomePageHandlerMapping = new WelcomePageHandlerMapping(
-				new TemplateAvailabilityProviders(applicationContext), applicationContext, getWelcomePage(),
-				this.mvcProperties.getStaticPathPattern());
-		welcomePageHandlerMapping.setInterceptors(getInterceptors(mvcConversionService, mvcResourceUrlProvider));
-		welcomePageHandlerMapping.setCorsConfigurations(getCorsConfigurations());
-		return welcomePageHandlerMapping;
-	}
-
-WelcomePageHandlerMapping(TemplateAvailabilityProviders templateAvailabilityProviders,
-		ApplicationContext applicationContext, Optional<Resource> welcomePage, String staticPathPattern) {
-	if (welcomePage.isPresent() && "/**".equals(staticPathPattern)) {
-        //要用欢迎页功能，必须是/**
-		logger.info("Adding welcome page: " + welcomePage.get());
-		setRootViewName("forward:index.html");
-	}
-	else if (welcomeTemplateExists(templateAvailabilityProviders, applicationContext)) {
-        // 调用Controller  /index
-		logger.info("Adding welcome page template: index");
-		setRootViewName("index");
-	}
-}
-```
-
-![image-20221119110827085](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221119110827085.png)
-
-### 请求参数处理
 
 #### 请求映射
 
@@ -437,7 +407,7 @@ Rest原理（表单提交要使用REST的时候）
 
 - 如PostMan直接发送Put、delete等方式请求，无需Filter。
 
-### 请求映射原理
+#### 请求映射原理
 
 SpringMVC中所有的请求都会过**DispatcherServlet**（前端控制器）
 
@@ -468,7 +438,7 @@ SpringMVC功能分析都从 org.springframework.web.servlet.DispatcherServlet-�
 
 ![image-20221119153541356](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221119153541356.png)
 
-### 参数处理原理
+#### 参数处理原理
 
 @PathVariable、@RequestHeader、@ModelAttribute、@RequestParam、@MatrixVariable、@CookieValue、@RequestBody
 
@@ -534,29 +504,232 @@ SpringMVC目标方法能写多少种参数类型。取决于参数解析器
 
 ![image-20221119193413441](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221119193413441.png)
 
-## Web组件
+### Web Component
 
-### 拦截器Interceptor
 
-![image-20221121122042619](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121122042619.png)
-
-### Servlet
+#### Servlet
 
 ![image-20221121123511247](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121123511247.png)
 
 ![image-20221121123835671](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121123835671.png)
 
-### Filter
+#### Filter
+
+> - It is a **Java Servlet component defined in the Servlet specification**.
+> - It is used mainly for logging, compression, encryption and decryption, input validation etc.
+> - It can be applied only on requests and responses.
+> - It doesn't have access to action context (Controller and Action), so it's not aware of the controller and action details.
+
+```java
+// Filter
+@Component
+public class MyFilter implements Filter {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) {
+        // Pre-processing
+        chain.doFilter(request, response);
+        // Post-processing
+    }
+}
+```
 
 ![image-20221121130741548](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121130741548.png)
 
-#### CharacterEncodingFilter解决响应中文乱码的Filter
+#### Interceptor
 
-yml配置
+> - It is **a concept defined in the Spring MVC framework**.
+> - It is used mainly for operations such as logging, validation, setting global attributes, etc.
+> - It can be applied on requests and responses, and additionally it can also be applied on exceptions.
+> - It has access to the action context (Controller and Action), so it's aware of the controller and action details.
 
-![image-20221121131916091](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121131916091.png)
+```java
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-![image-20221121132024668](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121132024668.png)
+@Component
+public class MyInterceptor extends HandlerInterceptorAdapter {
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        // This method will be called before the controller
+        System.out.println("Pre-handle");
+        return true;
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        // This method will be called after the controller
+        System.out.println("Post-handle");
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        // This method will be called after the complete request has finished
+        System.out.println("After completion");
+    }
+}
+```
+
+```java
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(new MyInterceptor())
+                .addPathPatterns("/**") // This will apply the interceptor to all routes
+                .excludePathPatterns("/exclude/**"); // This will exclude any routes that start with /exclude
+    }
+}
+```
+
+
+
+![image-20221121122042619](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121122042619.png)
+
+### RESTful
+
+**REST风格：使用url表示资源；使用http动作操作资源**
+
+**RESTful风格**中，当请求路径中将某些数据通过路径的方式传输到服 务器中，就可以在相应的@RequestMapping注解的value属性中通过占位符{xxx}表示传输的数据，在 **通过@PathVariable注解，将占位符所表示的数据赋值给控制器方法的形参**
+
+**url地址+请求方式确保是唯一**的 否则系统无法辨别 **导致启动出错**
+
+![image-20221027163300977](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221027163300977.png)
+
+**http请求中仅支持get以及post请求** 
+
+#### 使用PUT&DELETE请求
+
+**org.springframework.web.filter.HiddenHttpMethodFilter**
+
+若需要实现put以及delete请求需要使用**HiddenMethodFilter**通过**对post请求进行包装（装饰者模式）**成**put或delete请求**
+
+![image-20221121184206446](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121184206446.png)
+
+@GetMapping
+
+@PostMapping
+
+@PutMapping
+
+@DeleteMapping
+
+
+### Lombok
+
+![image-20221118223930965](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118223930965.png)
+
+![image-20221118223916959](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118223916959.png)
+
+![image-20221111095900057](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221111095900057.png)
+
+![image-20221118224021282](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118224021282.png)
+
+### @Slf4j日志
+
+![image-20221118224249140](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118224249140.png)
+
+![image-20221118224508000](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118224508000.png)
+
+![image-20221118224457296](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118224457296.png)
+
+
+### Dev-Tools
+
+热更新
+
+ctrl+F9
+
+![image-20221118225154707](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118225154707.png)
+
+![image-20221118224724053](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118224724053.png)
+
+### Thymeleaf
+
+https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html
+
+**Thymeleaf：是使用Java开发的模板技术**；在**服务端运行**。把处理后的数据发送给浏览器。
+
+模板做视图层工作的。用来显示数据的。
+
+基于HTML语言；应用在HTML中。
+
+
+
+![image-20221122151741138](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221122151741138.png)
+
+![image-20221122151841470](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221122151841470.png)
+
+![image-20221122151500438](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221122151500438.png)
+
+### 运行打包部署
+
+#### 在IDEA中直接运行SpringBoot程序的main方法（开发阶段）
+
+#### 用Maven将SpringBoot项目打包为jar包，使用Java命令（cmd）运行（上线部署阶段）
+
+##### cmd中启动
+
+```shell
+Java -jar springboot-xxx.jar
+```
+
+##### 在Linux中部署启动
+
+封装命令为shell脚本在Linux中部署运行
+
+1）：创建shell脚本文件
+
+```shell
+vim run.sh
+```
+
+2）：编写shell脚本
+
+```shell
+#！/bin/sh
+Java -jar 【.jar文件】
+```
+
+3）：赋权限
+
+```shell
+chomd 777 run.sh
+```
+
+4）：启动shell脚本
+
+```shell
+./run.sh
+```
+
+### .war&.jar
+
+##### .jar：打包Java文件
+
+**内嵌有tomcat服务器 可以独立运行**
+
+![image-20221122131720576](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221122131720576.png)
+
+![image-20221122132847108](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221122132847108.png)
+
+###### 命令行启动参数设置
+
+![image-20221122142433911](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221122142433911.png)
+
+##### .war：打包web项目
+
+![image-20221122131705265](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221122131705265.png)
+
+**打包好的.war文件可以放到tomcat服务器中运行**
+
+![image-20221122131745563](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221122131745563.png)
+
+
 
 ## &Mybatis
 
@@ -578,25 +751,22 @@ yml配置
 
 #### Spring中的事务管理：
 
-1）：管理事务的对象：事务管理器（接口，接口有很多实现类）
+> **If no custom rollback rules apply**, the transaction **will roll back on `RuntimeException` and `Error`** but **not on `checked exceptions`**.
 
-使用JDBC或Mybatis访问数据库，使用**事务管理器DataSourceTransactionManager**
 
-2）：**声明式事务**：使用注解说明事务控制的内容--**底层使用 AOP 原理**
-
-**控制事务：隔离级别；传播行为；超时时间**
-
-3）：事务的处理方式：
-
-1.**Spring中的@Transactional注解**
-
-2.aspectj框架可以再xml文件中声明事务的内容
 
 ![image-20221121180257137](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121180257137.png)
 
 #### 隔离级别
 
-![image-20221121175430623](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121175430623.png)
+[Isolation Level Tutorial](https://www.percona.com/blog/various-types-of-innodb-transaction-isolation-levels-explained-using-terminal/)
+
+|             Isolation Level              | Dirty Read | Can't Repeatable Read | Phantom Read |    Lock ?     |
+| :--------------------------------------: | :--------: | :-------------------: | :----------: | :-----------: |
+|             READ-UNCOMMITTED             |     √      |           √           |      √       | :key::unlock: |
+|              READ-COMMITTED              |     ×      |           √           |      √       | :key::unlock: |
+| **REPEATABLE-READ（Defualt in InnoDB）** |     ×      |           ×           |      √       | :key::unlock: |
+|               SERIALIZABLE               |     ×      |           ×           |      ×       |    :lock:     |
 
 #### 传播行为
 
@@ -608,33 +778,6 @@ yml配置
 
 ![image-20221121175509079](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121175509079.png)
 
-## REST风格
-
-**REST风格：使用url表示资源；使用http动作操作资源**
-
-**RESTful风格**中，当请求路径中将某些数据通过路径的方式传输到服 务器中，就可以在相应的@RequestMapping注解的value属性中通过占位符{xxx}表示传输的数据，在 **通过@PathVariable注解，将占位符所表示的数据赋值给控制器方法的形参**
-
-**url地址+请求方式确保是唯一**的 否则系统无法辨别 **导致启动出错**
-
-![image-20221027163300977](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221027163300977.png)
-
-**http请求中仅支持get以及post请求** 
-
-### 使用PUT&DELETE请求
-
-**org.springframework.web.filter.HiddenHttpMethodFilter**
-
-若需要实现put以及delete请求需要使用**HiddenMethodFilter**通过**对post请求进行包装（装饰者模式）**成**put或delete请求**
-
-![image-20221121184206446](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121184206446.png)
-
-@GetMapping
-
-@PostMapping
-
-@PutMapping
-
-@DeleteMapping
 
 ## &Redis
 
@@ -678,7 +821,39 @@ json序列化与反序列化：JSON格式和对象格式的相互转换
 
 ![image-20221121233237625](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121233237625.png)
 
-## Spring Cache
+
+## &Dubbo
+
+### Spring Boot 整合 Dubbo & Zookeeper 
+
+![image-20221115121936603](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221115121936603.png)
+
+![image-20221115121951179](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221115121951179.png)
+
+![image-20221115121959552](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221115121959552.png)
+
+![image-20221115122009262](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221115122009262.png)
+
+![image-20221115122015949](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221115122015949.png)
+
+![image-20221115122025070](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221115122025070.png)
+
+
+## Spring Security with JWT
+
+[Spring Security JWT Tutorial | Toptal®](https://www.toptal.com/spring/spring-security-tutorial)
+
+
+
+[JWT Tutorial](https://www.toptal.com/web/cookie-free-authentication-with-json-web-tokens-an-example-in-laravel-and-angularjs)
+
+
+
+## Spring Boot Validation
+
+[Validation Tutorial](https://www.bezkoder.com/spring-boot-custom-validation/)
+
+## Spring Boot Cache
 
 [A Guide To Caching in Spring | Baeldung](https://www.baeldung.com/spring-cache-tutorial)
 
@@ -1138,112 +1313,11 @@ Shortcuts for the method name (**#root.methodName**) and target class (**#root.t
 
 根据自己的业务需求进行设计
 
-## JSR303规范(注解方式)进行数据校验
+## Spring Boot Schedule
 
+[QuartZ Tutorial](https://hackernoon.com/how-to-schedule-jobs-with-quartz-in-spring-boot)
 
-
-## &Dubbo
-
-### Spring Boot 整合 Dubbo & Zookeeper 
-
-![image-20221115121936603](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221115121936603.png)
-
-![image-20221115121951179](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221115121951179.png)
-
-![image-20221115121959552](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221115121959552.png)
-
-![image-20221115122009262](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221115122009262.png)
-
-![image-20221115122015949](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221115122015949.png)
-
-![image-20221115122025070](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221115122025070.png)
-
-## .war&.jar
-
-### .jar：打包Java文件	
-
-**内嵌有tomcat服务器 可以独立运行**
-
-![image-20221122131720576](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221122131720576.png)
-
-![image-20221122132847108](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221122132847108.png)
-
-#### 命令行启动参数设置
-
-![image-20221122142433911](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221122142433911.png)
-
-### .war：打包web项目
-
-![image-20221122131705265](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221122131705265.png)
-
-**打包好的.war文件可以放到tomcat服务器中运行**
-
-![image-20221122131745563](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221122131745563.png)
-
-## SpringBoot项目运行方式
-
-### 在IDEA中直接运行SpringBoot程序的main方法（开发阶段）
-
-### 用Maven将SpringBoot项目打包为jar包，使用Java命令（cmd）运行（上线部署阶段）
-
-#### cmd中启动
-
-Java -jar springboot-xxx.jar
-
-#### 在Linux中部署启动
-
-封装命令为shell脚本在Linux中部署运行
-
-1）：创建shell脚本文件
-
-```
-vim run.sh
-```
-
-2）：编写shell脚本
-
-```shell
-#！/bin/sh
-Java -jar 【.jar文件】
-```
-
-3）：赋权限
-
-```
-chomd 777 run.sh
-```
-
-4）：启动shell脚本
-
-```
-./run.sh
-```
-
-## Thymeleaf
-
-https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html
-
-**Thymeleaf：是使用Java开发的模板技术**；在**服务端运行**。把处理后的数据发送给浏览器。
-
-模板做视图层工作的。用来显示数据的。
-
-基于HTML语言；应用在HTML中。
-
-### SpringBoot集成了Thymeleaf
-
-![image-20221122151741138](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221122151741138.png)
-
-![image-20221122151841470](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221122151841470.png)
-
-![image-20221122151500438](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221122151500438.png)
-
-## Spring Security with JWT
-
-[Spring Security JWT Tutorial | Toptal®](https://www.toptal.com/spring/spring-security-tutorial)
-
-
-
-## Spring Boot 注解
+## Spring Boot Annotation
 
 | 注解                                                    | 用法 |
 | ------------------------------------------------------- | ---- |
