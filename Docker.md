@@ -53,7 +53,7 @@ Docker 容器通过 Docker 镜像来创建。
 
 卸载老版本
 
-```
+```bash
  sudo yum remove docker \
                   docker-client \
                   docker-client-latest \
@@ -66,7 +66,7 @@ Docker 容器通过 Docker 镜像来创建。
 
 安装所需要的软件包
 
-```
+```bash
 yum -y install gcc
 
 yum -y install gcc-c++
@@ -159,7 +159,7 @@ docker info
 
 ### 帮助启动类命令
 
-```
+```shell
 启动
 systemctl start docker
 
@@ -189,7 +189,7 @@ docker 具体命令 --help
 
 **docker images :** 列出本地镜像。
 
-```
+```shell
 docker images [OPTIONS] [REPOSITORY[:TAG]]
 
 -a :列出本地所有的镜像（含中间映像层，默认情况下，过滤掉中间映像层）；
@@ -209,7 +209,7 @@ docker images [OPTIONS] [REPOSITORY[:TAG]]
 
 列出本地镜像中REPOSITORY为ubuntu的镜像列表。
 
-```
+```shell
 root@runoob:~# docker images  ubuntu
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
 ubuntu              14.04               90d5884b1ee0        9 weeks ago         188 MB
@@ -218,7 +218,7 @@ ubuntu              15.10               4e3b13c8a266        3 months ago        
 
 **docker search :** 从Docker Hub查找镜像
 
-```
+```shell
 docker search [OPTIONS] TERM
 
 --automated :只列出 automated build类型的镜像；
@@ -230,7 +230,7 @@ docker search [OPTIONS] TERM
 
 从 Docker Hub 查找所有镜像名包含 java，并且收藏数大于 10 的镜像
 
-```
+```shell
 runoob@runoob:~$ docker search -f stars=10 java
 NAME                  DESCRIPTION                           STARS   OFFICIAL   AUTOMATED
 java                  Java is a concurrent, class-based...   1037    [OK]       
@@ -253,7 +253,7 @@ AUTOMATED: 自动构建。
 
 只看前五个 使用--limit进行限制
 
-```
+```shell
 [root@192 ~]# docker search --limit 5 redis
 NAME                     DESCRIPTION                                     STARS     OFFICIAL   AUTOMATED
 redis                    Redis is an open source key-value store that…   11651     [OK]       
@@ -265,7 +265,7 @@ redislabs/rebloom        A probablistic datatypes module for Redis       21     
 
 **docker pull :** 从镜像仓库中拉取或者更新指定镜像
 
-```
+```shell
 docker pull [OPTIONS] NAME[:TAG|@DIGEST]
 未指定tag的默认拉取最新的版本
 
@@ -276,13 +276,13 @@ docker pull [OPTIONS] NAME[:TAG|@DIGEST]
 
 用于获取指定编译平台的镜像：
 
-```
+```shell
 docker pull --platform=arm64|amd64... image_name
 ```
 
 **docker push :** 将本地的镜像上传到镜像仓库,要先登陆到镜像仓库
 
-```
+```shell
 docker push [OPTIONS] NAME[:TAG]
 
 --disable-content-trust :忽略镜像的校验,默认开启
@@ -290,13 +290,13 @@ docker push [OPTIONS] NAME[:TAG]
 
 上传本地镜像myapache:v1到镜像仓库中。
 
-```
+```shell
 docker push myapache:v1
 ```
 
 **docker system df ：**查看镜像/容器/数据卷所占用空间
 
-```
+```shell
 [root@192 ~]# docker system df
 TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE
 Images          1         1         13.26kB   0B (0%)
@@ -307,7 +307,7 @@ Build Cache     0         0         0B        0B
 
 **docker rmi :** 删除本地一个或多个镜像。
 
-```
+```shell
 docker rmi [OPTIONS] IMAGE [IMAGE...]
 
 -f :强制删除；
@@ -317,7 +317,7 @@ docker rmi [OPTIONS] IMAGE [IMAGE...]
 
 强制删除本地镜像 runoob/ubuntu:v4。
 
-```
+```shell
 root@runoob:~# docker rmi -f runoob/ubuntu:v4
 Untagged: runoob/ubuntu:v4
 Deleted: sha256:1c06aa18edee44230f93a90a7d88139235de12cd4c089d41eed8419b503072be
@@ -326,7 +326,7 @@ Deleted: sha256:85feb446e89a28d58ee7d80ea5ce367eebb7cec70f0ec18aa4faa874cbd97c73
 
 删除所有本地镜像
 
-```
+```shell
 [root@192 ~]# docker rmi -f $(docker images -qa)
 Untagged: hello-world:latest
 Untagged: hello-world@sha256:faa03e786c97f07ef34423fccceeec2398ec8a5759259f94d99078f264e9d7af
@@ -337,7 +337,7 @@ Deleted: sha256:feb5d9fea6a5e9606aa995e879d862b825965ba48de054caab5ef356dc6b3412
 
 删除所有未被 tag 标记和未被容器使用的镜像:
 
-```
+```shell
 $ docker image prune
 WARNING! This will remove all dangling images.
 Are you sure you want to continue? [y/N] y
@@ -345,13 +345,13 @@ Are you sure you want to continue? [y/N] y
 
 删除所有未被容器使用的镜像:
 
-```
+```shell
 $ docker image prune -a
 ```
 
 删除所有停止运行的容器:
 
-```
+```shell
 $ docker container prune
 ```
 
@@ -363,13 +363,13 @@ $ docker volume prune
 
 删除所有网络:
 
-```
+```shell
 $ docker network prune
 ```
 
 删除 docker 所有资源:
 
-```
+```shell
 $ docker system prune
 ```
 
@@ -377,7 +377,7 @@ $ docker system prune
 
 **docker run ：**创建一个新的容器并运行一个命令
 
-```
+```shell
 docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
 
 -a stdin: 指定标准输入输出内容类型，可选 STDIN/STDOUT/STDERR 三项；
@@ -419,14 +419,14 @@ docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
 
 使用docker镜像Ubuntu容器；	交互式启动并在容器内执行/bin/bash（bash）命令;	指定name为myubuntu
 
-```
+```shell
 [root@192 ~]# docker run --name myubuntu -it ubuntu bash
 root@3988f7d93f0e:/# ls
 bin   dev  home  lib32  libx32  mnt  proc  run   srv  tmp  var
 boot  etc  lib   lib64  media   opt  root  sbin  sys  usr
 ```
 
-```
+```shell
 [root@192 ~]# docker ps
 CONTAINER ID   IMAGE     COMMAND   CREATED         STATUS         PORTS     NAMES
 3988f7d93f0e   ubuntu    "bash"    3 minutes ago   Up 3 minutes             myubuntu
@@ -434,7 +434,7 @@ CONTAINER ID   IMAGE     COMMAND   CREATED         STATUS         PORTS     NAME
 
 **exit：**从容其中退出并停止容器 **Ctrl + q + p：**从容器中退出不停止容器
 
-```
+```shell
 root@3988f7d93f0e:/# exit
 exit
 [root@192 ~]# 
@@ -442,13 +442,13 @@ exit
 
 绑定容器的 8080 端口，并将其映射到本地主机 127.0.0.1 的 80 端口上。
 
-```
+```shell
 $ docker run -p 127.0.0.1:80:8080/tcp ubuntu bash
 ```
 
 使用镜像 nginx:latest，以后台模式启动一个容器,将容器的 80 端口映射到主机的 80 端口,主机的目录 /data 映射到容器的 /data。
 
-```
+```shell
 docker run -p 80:80 -v /data:/data -d nginx:latest
 ```
 
@@ -456,7 +456,7 @@ docker run -p 80:80 -v /data:/data -d nginx:latest
 
 **docker rm ：**删除一个或多个容器。
 
-```
+```shell
 docker rm [OPTIONS] CONTAINER [CONTAINER...]
 
 -f :通过 SIGKILL 信号强制删除一个运行中的容器。
@@ -468,13 +468,13 @@ docker rm [OPTIONS] CONTAINER [CONTAINER...]
 
 删除所有已经停止的容器：
 
-```
+```shell
 docker rm $(docker ps -a -q)
 ```
 
 **docker ps :** 列出容器
 
-```
+```shell
 docker ps [OPTIONS]
 
 -a :显示所有的容器，包括未运行的。
@@ -500,7 +500,7 @@ docker ps [OPTIONS]
 
 **docker restart** :重启容器
 
-```
+```shell
 docker start [OPTIONS] CONTAINER [CONTAINER...]
 docker stop [OPTIONS] CONTAINER [CONTAINER...]
 docker restart [OPTIONS] CONTAINER [CONTAINER...]
@@ -508,7 +508,7 @@ docker restart [OPTIONS] CONTAINER [CONTAINER...]
 
 **docker kill** :杀掉一个运行中的容器。
 
-```
+```shell
 docker kill [OPTIONS] CONTAINER [CONTAINER...]
 ```
 
@@ -516,14 +516,14 @@ docker kill [OPTIONS] CONTAINER [CONTAINER...]
 
 **docker unpause** :恢复容器中所有的进程。
 
-```
+```shell
 docker pause CONTAINER [CONTAINER...]
 docker unpause CONTAINER [CONTAINER...]
 ```
 
 **docker exec ：**在运行的容器中执行命令
 
-```
+```shell
 docker exec [OPTIONS] CONTAINER COMMAND [ARG...]
 
 -d :分离模式: 在后台运行
@@ -535,14 +535,14 @@ docker exec [OPTIONS] CONTAINER COMMAND [ARG...]
 
 在容器 mynginx 中以交互模式执行容器内 /root/runoob.sh 脚本:
 
-```
+```shell
 runoob@runoob:~$ docker exec -it mynginx /bin/sh /root/runoob.sh
 http://www.runoob.com/
 ```
 
 在容器 mynginx 中开启一个交互模式的终端:
 
-```
+```shell
 runoob@runoob:~$ docker exec -i -t  mynginx /bin/bash
 root@b1a0703e41e7:/#
 ```
@@ -551,7 +551,7 @@ root@b1a0703e41e7:/#
 
 查看已经在运行的容器 ID：
 
-```
+```shell
 # docker ps -a 
 ...
 9df70f9a0714        openjdk             "/usercode/script.sh…" 
@@ -562,19 +562,19 @@ root@b1a0703e41e7:/#
 
 通过 exec 命令对指定的容器执行 bash:
 
-```
+```shell
 # docker exec -it 9df70f9a0714 /bin/bash
 ```
 
 **docker inspect 容器**：检阅容器
 
-```
+```shell
 docker inspect redis
 ```
 
 **容器自动启动**
 
-```
+```shell
 docker udpate (containerId) --restart=always
 ```
 
