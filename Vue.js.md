@@ -129,7 +129,7 @@ https://vuejs.org/
 >    <template>
 >      <button @click="count++">{{ count }}</button>
 >    </template>
->                   
+>                      
 >    <script>
 >    export default {
 >      data() {
@@ -152,18 +152,18 @@ https://vuejs.org/
 >    <template>
 >      <button @click="increment()">{{ count }}</button>
 >    </template>
->                   
+>                      
 >    <script>
 >    import { ref } from 'vue'
->                   
+>                      
 >    export default {
 >      setup() {
 >        const count = ref(0);
->                   
+>                      
 >        function increment() {
 >          count.value++;
 >        }
->                   
+>                      
 >        return {
 >          count,
 >          increment
@@ -180,16 +180,16 @@ https://vuejs.org/
 >    <template>
 >      <button @click="increment()">{{ count }}</button>
 >    </template>
->                   
+>                      
 >    <script setup>
 >    import { ref, onMounted } from 'vue'
->                   
+>                      
 >    const count = ref(0);
->                   
+>                      
 >    const increment = () => {
 >      count.value++;
 >    }
->                   
+>                      
 >    onMounted(() => {
 >      console.log(count.value); // 0
 >    });
@@ -379,7 +379,7 @@ export default {
 >       <span v-html="rowHTML"></span>
 >     </div>
 >   </template>
->         
+>           
 >   <script>
 >   export default {
 >     name: 'HelloWorld',
@@ -544,37 +544,37 @@ export default {
 >   ```vue
 >   <!-- method handler -->
 >   <button v-on:click="doThis"></button>
->           
+>             
 >   <!-- dynamic event -->
 >   <button v-on:[event]="doThis"></button>
->           
+>             
 >   <!-- inline statement -->
 >   <button v-on:click="doThat('hello', $event)"></button>
->           
+>             
 >   <!-- shorthand -->
 >   <button @click="doThis"></button>
->           
+>             
 >   <!-- shorthand dynamic event -->
 >   <button @[event]="doThis"></button>
->           
+>             
 >   <!-- stop propagation -->
 >   <button @click.stop="doThis"></button>
->           
+>             
 >   <!-- prevent default -->
 >   <button @click.prevent="doThis"></button>
->           
+>             
 >   <!-- prevent default without expression -->
 >   <form @submit.prevent></form>
->           
+>             
 >   <!-- chain modifiers -->
 >   <button @click.stop.prevent="doThis"></button>
->           
+>             
 >   <!-- key modifier using keyAlias -->
 >   <input @keyup.enter="onEnter" />
->           
+>             
 >   <!-- the click event will be triggered at most once -->
 >   <button v-on:click.once="doThis"></button>
->           
+>             
 >   <!-- object syntax -->
 >   <button v-on="{ mousedown: doThis, mouseup: doThat }"></button>
 >   ```
@@ -610,37 +610,37 @@ export default {
 >   ```vue
 >   <!-- bind an attribute -->
 >   <img v-bind:src="imageSrc" />
->           
+>             
 >   <!-- dynamic attribute name -->
 >   <button v-bind:[key]="value"></button>
->           
+>             
 >   <!-- shorthand -->
 >   <img :src="imageSrc" />
->           
+>             
 >   <!-- shorthand dynamic attribute name -->
 >   <button :[key]="value"></button>
->           
+>             
 >   <!-- with inline string concatenation -->
 >   <img :src="'/path/to/images/' + fileName" />
->           
+>             
 >   <!-- class binding -->
 >   <div :class="{ red: isRed }"></div>
 >   <div :class="[classA, classB]"></div>
 >   <div :class="[classA, { classB: isB, classC: isC }]"></div>
->           
+>             
 >   <!-- style binding -->
 >   <div :style="{ fontSize: size + 'px' }"></div>
 >   <div :style="[styleObjectA, styleObjectB]"></div>
->           
+>             
 >   <!-- binding an object of attributes -->
 >   <div v-bind="{ id: someProp, 'other-attr': otherProp }"></div>
->           
+>             
 >   <!-- prop binding. "prop" must be declared in the child component. -->
 >   <MyComponent :prop="someThing" />
->           
+>             
 >   <!-- pass down parent props in common with a child component -->
 >   <MyComponent v-bind="$props" />
->           
+>             
 >   <!-- XLink -->
 >   <svg><a :xlink:special="foo"></a></svg>
 >   ```
@@ -649,7 +649,7 @@ export default {
 >
 >   ```vue
 >   <div :someProperty.prop="someObject"></div>
->           
+>             
 >   <!-- equivalent to -->
 >   <div .someProperty="someObject"></div>
 >   ```
@@ -700,16 +700,16 @@ export default {
 >     <template v-slot:header>
 >       Header content
 >     </template>
->       
+>         
 >     <template v-slot:default>
 >       Default slot content
 >     </template>
->       
+>         
 >     <template v-slot:footer>
 >       Footer content
 >     </template>
 >   </BaseLayout>
->       
+>         
 >   <!-- Named slot that receives props -->
 >   <InfiniteScroll>
 >     <template v-slot:item="slotProps">
@@ -718,7 +718,7 @@ export default {
 >       </div>
 >     </template>
 >   </InfiniteScroll>
->       
+>         
 >   <!-- Default slot that receive props, with destructuring -->
 >   <Mouse v-slot="{ x, y }">
 >     Mouse position: {{ x }}, {{ y }}
@@ -830,7 +830,7 @@ export default {
 >         {{ message }}
 >       </div>
 >   </template>
->           
+>             
 >   <style>
 >       [v-cloak] {
 >         display: none;
@@ -1127,11 +1127,11 @@ defineProps({
 >   ```javascript
 >   <script setup>
 >   import { ref, watchEffect } from 'vue';
->             
+>               
 >   let question = ref({ question: '' });
 >   let answer = ref('Questions usually contain a question mark.');
 >   let loading = ref(false);
->             
+>               
 >   //tracks all reactive dependencies within the provided function
 >   watchEffect(
 >     () => {
@@ -1140,7 +1140,7 @@ defineProps({
 >       console.log("loading:",loading.value);
 >     }
 >   );
->             
+>               
 >   <script/>
 >   ```
 >
@@ -1683,11 +1683,11 @@ onUpdated(() => {
 >   ```vue
 >   <script setup>
 >   import { ref, onMounted } from 'vue'
->             
+>               
 >   // declare a ref to hold the element reference
 >   // the name must match template ref value
 >   const input = ref(null)
->             
+>               
 >   onMounted(() => {
 >     input.value.focus()
 >   })
@@ -2627,6 +2627,8 @@ export default {
 
 ## Vue Cli
 
+### Installation
+
 ```bash
 # 全局安装webpack
 
@@ -2644,6 +2646,16 @@ npm install --global vue-cli
 ```
 
 ![image-20221217223805568](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221217223805568.png)
+
+### Create a Project
+
+```bash
+vue create project-name
+```
+
+![image-20231126100513640](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20231126100513640.png)
+
+![image-20231126101228526](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20231126101228526.png)
 
 ## Vue-UI-Plugins
 

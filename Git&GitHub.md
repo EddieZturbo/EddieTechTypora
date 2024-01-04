@@ -44,6 +44,14 @@ Git是免费的**开源**的 **分布式版本控制系统**（区别去集中�
 | ------------ | ------------------------------------------------------------ |
 | `git revert` | Create new commit that undo all of the changes mage in <commit> then apply it to current branch<br /><br />比如，我们commit了三个版本（版本一、版本二、 版本三），突然发现版本二不行（如：有bug），想要撤销版本二，但又不想影响撤销版本三的提交，就可以用 git revert 命令来反做版本二，生成新的版本四，这个版本四里会保留版本三的东西，但撤销了版本二的东西。 |
 
+**查看所有的config配置项**
+
+```bash
+git config --list
+```
+
+
+
 **从 Git 仓库和文件系统中删除文件。**
 
 ```text

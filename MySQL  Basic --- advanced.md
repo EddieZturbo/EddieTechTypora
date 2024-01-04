@@ -13120,11 +13120,43 @@ MySQL 数据库与 Oracle、 SQL Server 等数据库相比，有其内核上的�
 
 ![image-20230201105921902](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20230201105921902.png)
 
+### 存储引擎
+
+#### InnoDB
+
+[MySQL and InnoDB Storage Engine Summary](https://www.sobyte.net/post/2022-08/mysql-innodb/)
+
+> - **事务支持：** InnoDB是一个支持事务的存储引擎。它遵循ACID（原子性、一致性、隔离性、持久性）属性，确保事务的完整性和一致性。
+> - **多版本并发控制（MVCC）：** InnoDB使用MVCC来实现高度的并发性。每个事务都可以访问数据库的不同版本，而不会阻塞其他事务的读取操作。
+> - **行级锁定：** InnoDB支持行级锁定，而不是表级锁定。这提高了并发性，允许多个事务同时对同一表的不同行进行操作。
+> - **外键约束：** InnoDB支持外键约束，确保数据的一致性和完整性。当定义外键关系时，InnoDB会自动处理级联更新和级联删除。
+> - **缓冲池：** InnoDB使用缓冲池来缓存表和索引数据。这加速了对常用数据的访问，减少了对磁盘的I/O操作。
+> - **脏页（Dirty Pages）和刷新机制:** 当InnoDB对缓冲池中的数据页进行修改时，这些页就变成了脏页，表示其内容已被更改。为了保持数据的一致性，InnoDB使用了一种称为"checkpoint"的机制。在checkpoint发生时，脏页会被刷新（写回）到磁盘。这个过程会产生磁盘I/O，但是通过合理的配置和调整，可以降低对磁盘的写入频率
+> - **自适应哈希索引：** InnoDB引擎能够根据查询模式动态地创建自适应哈希索引，提高特定查询的性能。
+> - **独立表空间：** 每个InnoDB表都有自己的独立表空间，这允许对表进行单独的备份、优化和恢复操作。
+> - **预读机制：** InnoDB使用预读机制，提前从磁盘读取邻近的数据页到缓冲池，以提高数据的访问速度。
+> - **RedoLog日志文件：** InnoDB引擎有一个RedoLog事务日志，用于记录对数据库的修改操作。这确保了在系统崩溃时可以进行恢复。
+> - **自动增长列：** InnoDB支持自动增长列，这样在插入数据时，不需要手动指定主键的值，系统会自动分配。
+> - **全文本搜索：** InnoDB提供了全文本搜索的功能，通过全文本索引可以进行高效的文本搜索。
+> - **压缩表：** InnoDB支持对表进行压缩，减小磁盘占用，提高性能。
+> - **插入缓冲：** InnoDB通过插入缓冲池来提高插入操作的性能。插入缓冲将插入操作收集在内存中，然后按块写入磁盘，减少磁盘I/O。
+> - **并发控制：** InnoDB使用各种技术来实现高并发控制，包括多版本并发控制、一致性读等。
+
+![image-20221105151036572](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221105151036572.png)
+
+#### MyISAM
+
+![image-20221105151306925](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221105151306925.png)
+
+#### 二者对比
+
+![image-20221105151331261](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221105151331261.png)
 
 
 ### MySQL三大日志
 
 > MySQL**采用WAL（Write-Ahead Log）先写日志机制**
+> 提高了性能，又保障了数据的持久性和一致性。 Write-Ahead Log机制可以在数据库崩溃时进行恢复，确保了事务的原子性和一致性
 >
 > - redo log 和 binlog都是**顺序写**，磁盘的顺序写比随机写速度要快；
 > - **组提交机制**，可以大幅度降低磁盘的IOPS消耗。（日志逻辑序列号（log sequence number，LSN）的概念。LSN是单调递增的，用来对应redo log的一个个写入点。每次写入长度为length的redo log， LSN的值就会加上length。）
@@ -13142,8 +13174,6 @@ MySQL 数据库与 Oracle、 SQL Server 等数据库相比，有其内核上的�
 > 
 >
 > **“双1”配置**，指的就是**sync_binlog和innodb_flush_log_at_trx_commit都设置成 1**。也就是说，一个事务完整提交前，需要等待两次刷盘，一次是redo log（prepare 阶段），一次是binlog。
->
-> 
 >
 > 
 >
@@ -13566,7 +13596,9 @@ select SQL_NO_CACHE * from user;
 
 比如系统配置 字典表
 
-### MySQL SQL语句书写顺序和执行顺序
+
+
+### SQL语句书写顺序和执行顺序
 
 ```sql
 (7) SELECT
@@ -13606,8 +13638,6 @@ select SQL_NO_CACHE * from user;
 
 *MVCC，全称**Multi-Version Concurrency Control**，即多版本并发控制。MVCC是一种并发控制的方法，一般在数据库管理系统中，实现对数据库的并发访问，在编程语言中实现事务内存。*
 
-
-
 > **MVCC works only with** the **REPEATABLE READ** and **READ COMMITTED** isolation levels. 
 >
 > READ UNCOMMITTED isn’t MVCC-compatible because queries don’t read the row version
@@ -13630,10 +13660,6 @@ select SQL_NO_CACHE * from user;
 > 在**并发读写数据库时**，可以做到在**读操作时不用阻塞写操作**，**写操作也不用阻塞读操作**，**提高**了数据库**并发读写的性能** 同时还**可以解决脏读，幻读，不可重复读**等事务隔离问题，**但不能解决更新丢失问题**
 >
 
-
-
-
-
 **数据库并发场景**
 
 - **读-读**：不存在任何问题，也不需要并发控制
@@ -13642,16 +13668,12 @@ select SQL_NO_CACHE * from user;
 
 - **写-写**：有线程安全问题，可能会存在更新丢失问题，比如第一类更新丢失，第二类更新丢失
 
-
-
 **小结一下**
 
 MVCC就是因为大牛们，不满意只让数据库采用悲观锁这样性能不佳的形式去解决读-写冲突问题，而提出的解决方案，所以在数据库中，因为有了MVCC，所以我们可以形成两个组合：
 
 - **MVCC + 悲观锁** MVCC解决读写冲突，悲观锁解决写写冲突
 - **MVCC + 乐观锁** MVCC解决读写冲突，乐观锁解决写写冲突
-
-
 
 ```sql
 /** The MVCC read view manager */
@@ -14045,21 +14067,6 @@ SELECT ... FOR UPDATE;
 > DELETE...
 > ```
 
-### 存储引擎
-
-#### InnoDB
-
-具备**外键**支持功能的**事务**存储引擎
-
-![image-20221105151036572](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221105151036572.png)
-
-#### MyISAM
-
-![image-20221105151306925](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221105151306925.png)
-
-#### 二者对比
-
-![image-20221105151331261](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221105151331261.png)
 
 ### 索引
 
@@ -14103,9 +14110,42 @@ B+Tree的特点是树**高度很低**（IO的次数少） 叶子节点出度很�
 
 ![image-20221117170234277](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221117170234277.png)
 
-B+Tree
+#### B+Tree
 
-![image-20221117163321223](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221117163321223.png)
+![image-20240104103758043](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20240104103758043.png)
+
+> B+树是一种广泛用于数据库索引的数据结构，它在**设计上考虑了磁盘的读写特性**，使得其在**存储和检索数据时能够更好地利用磁盘的性能**
+> [The Power of B+ Trees in InnoDB’s Indexing](https://levelup.gitconnected.com/the-power-of-b-trees-in-innodbs-indexing-f7868f92c425)
+>
+> ### **优势特性：**
+>
+> - **顺序访问和局部性原理：**
+>   - B+树的节点是按照顺序存储的，相邻的节点在磁盘上也是相邻的。这符合磁盘的预读特性，即在读取一个块的时候，很可能会顺便将相邻的块也读取到内存中。
+>   - 局部性原理表明，一旦某个数据被访问，其附近的数据也很可能会被访问。B+树的结构使得在磁盘上相邻的节点通常包含相近的关键字范围，从而提高了顺序访问的可能性。
+> - **节点的高 Fan-out 减少树的高度：**
+>   - B+树的节点通常包含多个关键字和子节点，这意味着每个磁盘块可以存储更多的关键字。高Fan-out减少了树的高度，使得在查询过程中需要访问的磁盘块数目减少。
+>   - 较高的Fan-out意味着在每一层上，树可以覆盖更大的关键字范围，减少了磁盘I/O的次数。
+> - **只在叶子节点（Leaf Node）存储数据：**
+>   - B+树的内部节点只存储关键字，不存储实际的数据，只有叶子节点包含全部的关键字和数据。这种结构使得在搜索时只需访问叶子节点，从而实现了更加顺序化的I/O访问，减少了磁盘寻址的成本。
+>   - 另外，由于内部节点较小，一个磁盘块可以容纳更多的内部节点，提高了内部节点的Fan-out。
+>
+> ### **维护成本：**
+>
+> B+树**为了维护索引的有序性，在插入或删除值时需要进行必要的维护**
+>
+> 插入操作：
+>
+> - 搜索操作： 从根节点开始，按照B+树的搜索规则找到要插入的位置，定位到叶子节点。
+> - 插入新值： 在叶子节点中插入新值。如果插入导致叶子节点的大小超过了阶数限制，进行**页分裂**操作，确保叶子节点的有序性。
+> - 向上递归： 如果分裂导致父节点超过阶数限制，递归进行分裂操作，并将中间值上推到更高层的节点。
+> - 更新根节点： 如果根节点分裂，需要更新树的根节点。
+>
+> 删除操作：
+>
+> - 搜索操作： 从根节点开始，按照B+树的搜索规则找到要删除的位置，定位到叶子节点。
+> - 删除值： 在叶子节点中删除指定的值。如果删除导致叶子节点的大小低于阶数的一半，进行**页合并**或者借用操作，确保叶子节点的有序性。
+> - 向上递归： 如果合并导致父节点的大小低于阶数的一半，递归进行合并操作，并将中间值下推到更低层的节点。
+> - 更新根节点： 如果根节点的子节点数量低于两个，需要更新树的根节点。
 
 #### 聚簇索引
 
@@ -14151,11 +14191,11 @@ B+Tree
 
 #### Innodb引擎索引的注意事项
 
-#### 根页面万年不动
+##### 根页面万年不动
 
 当索引创建的时候是从根节点出发的
 
-#### 内节点中目录项记录的唯一性
+##### 内节点中目录项记录的唯一性
 
 非聚簇索引中 也就是**非主键索引中** 可能创建的索引会出现相同的情况 因此**为了保证目录项的唯一性** 使用**主键+页号**的方式构成
 
@@ -14163,7 +14203,7 @@ B+Tree
 
 ![image-20221117165446585](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221117165446585.png)
 
-#### 一个页面最少储存2条记录
+##### 一个页面最少储存2条记录
 
 #### 哈希|二叉树|AVLTree|B-Tree|红黑树|B+Tree
 
