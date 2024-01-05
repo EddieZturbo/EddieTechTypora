@@ -1559,7 +1559,7 @@ public class SpringHelloApplication {
 
 ### 按需加载（@Conditional条件装配）
 
-#### @Import(AutoConfigurationImportSelector.class)
+**@Import(AutoConfigurationImportSelector.class)**
 
 ```java
 1、利用getAutoConfigurationEntry(annotationMetadata);给容器中批量导入一些组件
@@ -1573,18 +1573,16 @@ public class SpringHelloApplication {
 
 ![image-20221118195405828](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118195405828.png)
 
-#### 按需加载
+#### 按照条件装配
 
 虽然我们127个场景的所有自动配置启动的时候默认全部加载。xxxxAutoConfiguration
 按照条件装配规则（@Conditional），最终会按需配置。
 
 ![image-20221118195201168](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118195201168.png)
 
-### IOC容器功能
+### 组件添加至IOC容器中
 
-#### 组件添加
-
-##### @Configuration|@Bean
+#### @Configuration|@Bean
 
 **.`@Configuration`配置类是有主次之分的，主配置类是驱动整个程序的入口，可以是一个，也可以是多个（若存在多个，支持使用@Order排序）**
 
@@ -1635,7 +1633,7 @@ console
 
 ![image-20221118112300368](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118112300368.png)
 
-##### @Component
+#### @Component
 
 标识为任意层组件的注解
 
@@ -1647,7 +1645,7 @@ public @Component {
 }
 ```
 
-##### @Controller
+#### @Controller
 
 标识为Controller层的注解
 
@@ -1662,7 +1660,7 @@ public @Controller {
 }
 ```
 
-##### @Service
+#### @Service
 
 标识为Service层的注解
 
@@ -1677,7 +1675,7 @@ public @Service {
 }
 ```
 
-##### @Repository
+#### @Repository
 
 标识为DAO层的注解
 
@@ -1692,7 +1690,7 @@ public @Repository {
 }
 ```
 
-##### @ComponentScan
+#### @ComponentScan
 
 开启组件扫描并指定组件扫描的包范围的注解
 
@@ -1700,7 +1698,7 @@ public @Repository {
 
 ![image-20221118114040367](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118114040367.png)
 
-##### @Import
+#### @Import
 
 @Import（{JdbcConfig.class,SpringMvcConfig.class}）默认在IOC容器中的BeanName为全类名
 
@@ -1716,7 +1714,7 @@ public @Import {
 }
 ```
 
-##### @Conditional
+#### @Conditional
 
 **条件装配**：满足Conditional指定的条件，则进行组件注入
 
@@ -1769,9 +1767,110 @@ public static void main(String[] args) {
 
 ![image-20221118130304008](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118130304008.png)
 
-#### 配置文件引入
+### 依赖注入
 
-##### @ImportResource("classpath:配置文件名")
+> 在Spring Boot中，`@Autowired`, `@Qualifier`,和 `@Resource` 是用于依赖注入的注解
+> `@Autowired` 是Spring提供的，而 `@Resource` 是Java EE提供的，但Spring也支持。
+>
+> - `@Autowired` 默认**按照类型**进行匹配注入，而 `@Qualifier` 配合 `@Autowired` 使用时，**可以按照名称**进行匹配。(:happy:Recommend)
+>
+> ```java
+> @Autowired//**按照类型**进行匹配注入
+> private MyService myService;
+> ```
+>
+> ```java
+> @Autowired//`@Qualifier` 配合 `@Autowired` 使用时，**可以按照名称**进行匹配。
+> @Qualifier("myServiceImplementation")
+> private MyService myService;
+> ```
+>
+> - `@Resource` **可以指定Bean的名称**，如果没有指定名称，它会按照类型进行匹配。
+>
+> ```java
+> @Resource(name = "myServiceImplementation")//可以指定Bean的名称，如果没有指定名称，它会按照类型进行匹配
+> private MyService myService;
+> ```
+>
+> 
+
+### 注入外部配置属性值
+
+> `@Value`注解用于将外部属性值注入到Spring Bean中。这个注解允许你**从属性文件、环境变量、或其他外部配置源中读取值**，并将它们**注入到你的应用程序中**
+>
+> - **用法：**
+>   - `@Value`可以用在字段、构造方法、方法参数上，用于注入外部属性值。
+>   - `@Value("#{systemProperties.myProp}")`它支持SpEL（Spring Expression Language）表达式，可以将**system properties**注入到Spring Bean中
+>   - `@Value("${my.app.myProp}")`可以将**配置文件(.yaml/.properties)中的属性值**注入到Spring Bean中
+> - **作用：**
+>   - **注入外部配置属性：** 通过`@Value`注解，你可以将**配置文件(.yaml/.properties)中的属性值**和**system properties**注入到Spring Bean中。
+>   - **动态属性值：** 你可以在运行时根据需要更改这些属性值，而不需要修改代码。
+>   - **SpEL支持：** 支持使用SpEL表达式进行属性值的计算和引用。
+
+```java
+@Component
+public class MyComponent {
+
+    @Value("${my.property}")
+    private String myProperty;
+
+    @Value("${my.default:default-value}")
+    private String myDefaultProperty;
+
+    // Constructor injection
+    @Autowired
+    public MyComponent(@Value("${my.other-property}") String otherProperty) {
+        // ...
+    }
+
+    // Method parameter injection
+    @Autowired
+    public void setAnotherProperty(@Value("${my.another-property}") String anotherProperty) {
+        // ...
+    }
+    
+    // Using SpEL expression
+    @Value("#{systemProperties['java.home']}")
+    private String javaHome;
+
+    // Using SpEL expression with default value
+    @Value("#{systemProperties['nonexistent.property'] ?: 'default-value'}")
+    private String nonExistentProperty;
+
+    // ...
+}
+```
+
+```yaml
+# application.yml
+
+# Define a simple property
+my:
+  property: value-from-yaml
+
+# Define a property with a default value
+my:
+  default: default-value
+
+# Define other properties
+my:
+  other-property: another-value
+  another-property: yet-another-value
+```
+
+```bash
+# when running your Spring Boot application using the command line, you can pass system properties
+
+java -jar your-application.jar -Djava.home=/path/to/java/home -Dnonexistent.property=some-value
+
+In the above command:
+# -Djava.home=/path/to/java/home sets the system property java.home.
+# -Dnonexistent.property=some-value sets the system property nonexistent.property.
+```
+
+### 配置文件引入
+
+> @ImportResource("classpath:配置文件名")
 
 引入xml等配置文件
 
@@ -1779,7 +1878,7 @@ public static void main(String[] args) {
 @ImportResource("classpath:beans.xml")
 public class MyConfig {}
 
-======================测试=================
+//======================测试======================
         boolean haha = run.containsBean("haha");
         boolean hehe = run.containsBean("hehe");
         System.out.println("haha："+haha);//true
@@ -1808,9 +1907,11 @@ public class MyConfig {}
 </beans>
 ```
 
-#### 配置绑定（读取配置内容封装成实体类对象）
+### 配置绑定
 
-##### 引入依赖
+**（读取配置内容封装成实体类对象）**
+
+#### 引入依赖
 
 ```xml
 <dependency>
@@ -1824,7 +1925,9 @@ public class MyConfig {}
 
 **将配置文件中的内容读取**并且**封装成Java实体对象**以**供后续使用**
 
-##### 方式一@Component+@ConfigurationProperties
+#### 方式一
+
+> @Component+@ConfigurationProperties
 
 ```java
 @Data
@@ -1850,7 +1953,9 @@ user:
 
 ![image-20221118185905550](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118185905550.png)
 
-##### 方式二@EnableConfigurationProperties+@ConfigurationProperties
+#### 方式二
+
+> @EnableConfigurationProperties+@ConfigurationProperties
 
 ![image-20221118190541939](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221118190541939.png)
 
