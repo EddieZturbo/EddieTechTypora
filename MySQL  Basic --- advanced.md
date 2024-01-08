@@ -4632,6 +4632,23 @@ DELETE FROM TableName WHERE CONDITION;
 ### Reset AutoIncrement_Primary_Id
 
 > **Solve** the problem that **the primary key id is not continuous**
+>
+> 为了解决这个主键冲突 为了性能考虑InnoDB放弃了这个设计，使用最简单的方式获取自增值，**即使语句执行失败也不回退自增id，因此自增id是递增的，但不保证是连续递增**
+>
+> **自增值不连续的 4 个场景：**
+>
+> 1. 自增初始值和自增步长设置不为 1
+> 2. 唯一键冲突
+> 3. 事务回滚
+> 4. 批量插入（如 `insert...select` 语句）
+>
+> **自增值记录方式：**
+>
+> - MySQL5.7版本
+>   - 在 MySQL 5.7 及之前的版本，**自增值保存在内存里，并没有持久化**。每次重启后，第一次打开表的时候，都会去找自增值的最大值 `max(id)`，然后将 `max(id)+1` 作为这个表当前的自增值。
+>
+> - MySQL8.0之后版本
+>   - 在 MySQL 8.0 版本，将自增值的变更记录在了 `redo log` 中，重启的时候依靠 `redo log` 恢复重启之前的值。
 
 ```mysql
 set @rownum = 0;
@@ -4851,7 +4868,7 @@ SELECT PatientID, PatientName, Age
 FROM Patients;
 ```
 
-#### 10. SHOW TABLE
+#### 10. SHOW TABLES
 
 Used to list all the tables created in a database. Here, please note that  you have to use the database first before displaying the database
 
@@ -4866,6 +4883,46 @@ Example:
 ```sql
 USE PatientsDatabase;
 SHOW TABLES;
+```
+
+#### 10.1 SHOW CREATE TABLE
+
+Used to show the data table creation statements
+
+Syntax:
+
+```sql
+SHOW CREATE TABLE table_name
+```
+
+Example:
+
+```sql
+mysql> SHOW CREATE TABLE jobs \G;
+
+*************************** 1. row ***************************
+       Table: jobs
+Create Table: CREATE TABLE `jobs` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `score` int DEFAULT NULL COMMENT '得分',
+  `student_code` int NOT NULL COMMENT '学号',
+  `student_name` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '学 生姓名',
+  `is_qualify` tinyint DEFAULT NULL COMMENT '是否合格（0不合格1合格）',
+  `is_commit` tinyint DEFAULT NULL COMMENT '是否已提交（0未提交1提交）',
+  `job_status` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL COMMENT ' 作业状态 （0未批改1已批改）',
+  `commit_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '作业提交时间',
+  `work_code` tinyint NOT NULL COMMENT '作业编号',
+  `work_name` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '作业名称',
+  `course_code` tinyint NOT NULL COMMENT '课程编号',
+  `course_name` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '课程名称',
+  `auxiliary_score` double(255,2) DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=1729480862809071707 DEFAULT CHARSET=utf8mb3 ROW_FORMAT=DYNAMIC
+1 row in set (0.00 sec)
+
+ERROR:
+No query specified
+
 ```
 
 #### 11. ALTER TABLE
@@ -4902,7 +4959,25 @@ DESCRIBE TableName;
 Example:
 
 ```sql
-DESCRIBE Patients;
+DESCRIBE jobs;
++-----------------+---------------+------+-----+---------+-----------------------------+
+| Field           | Type          | Null | Key | Default | Extra                       |
++-----------------+---------------+------+-----+---------+-----------------------------+
+| id              | bigint        | NO   | PRI | NULL    | auto_increment              |
+| score           | int           | YES  |     | NULL    |                             |
+| student_code    | int           | NO   |     | NULL    |                             |
+| student_name    | varchar(255)  | NO   |     | NULL    |                             |
+| is_qualify      | tinyint       | YES  |     | NULL    |                             |
+| is_commit       | tinyint       | YES  |     | NULL    |                             |
+| job_status      | varchar(255)  | YES  |     | NULL    |                             |
+| commit_time     | datetime      | YES  |     | NULL    | on update CURRENT_TIMESTAMP |
+| work_code       | tinyint       | NO   |     | NULL    |                             |
+| work_name       | varchar(255)  | NO   |     | NULL    |                             |
+| course_code     | tinyint       | NO   |     | NULL    |                             |
+| course_name     | varchar(255)  | NO   |     | NULL    |                             |
+| auxiliary_score | double(255,2) | YES  |     | NULL    |                             |
++-----------------+---------------+------+-----+---------+-----------------------------+
+13 rows in set (0.01 sec)
 ```
 
 #### 13. TRUNCATE TABLE
