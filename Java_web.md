@@ -272,7 +272,7 @@ docBase 表示你的工程目录在哪里
 
 ![image-20220924223149982](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20220924223149982.png)
 
-### **新建动态web**
+**新建动态web**
 
 **先new一个普通的Mudule**
 
