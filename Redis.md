@@ -4,6 +4,8 @@ https://redis.io/
 
 ![image-20230130205947937](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20230130205947937.png)
 
+![image-20240130162356393](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20240130162356393.png)
+
 > Redis是一个开源的**内存数据存储系统**，可以用作数据库、缓存和消息中间件。它支持多种数据结构，包括字符串、哈希表、列表、集合和有序集合等，并提供了丰富的API以及高可用性、分布式、事务等特性。Redis被广泛用于互联网应用领域，如社交网络、电子商务、游戏等。
 >
 > 以下是Redis的一些使用场景：
