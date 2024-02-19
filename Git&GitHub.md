@@ -36,7 +36,11 @@ Git是免费的**开源**的 **分布式版本控制系统**（区别去集中�
 
 ### Git常用命令
 
+![image-20230329094447847](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20230329094447847.png)
 
+![image-20230329094605110](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20230329094605110.png)
+
+![image-20221112192838461](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221112192838461.png)
 
 ![image-20221112192413869](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221112192413869.png)
 
@@ -102,13 +106,6 @@ $ git commit -m "removed folder1"
 $ git push origin main
 ```
 
-
-
-![image-20221112192838461](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221112192838461.png)
-
-![image-20230329094447847](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20230329094447847.png)
-
-![image-20230329094605110](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20230329094605110.png)
 
 ### Git上传文件超过100M
 
