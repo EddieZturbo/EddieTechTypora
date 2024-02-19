@@ -233,6 +233,8 @@ git config -l
 
 #### 从Git Hub远程库中pull下来至本地库
 
+![image-20240219112554486](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20240219112554486.png)
+
 ![image-20221113002225304](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221113002225304.png)
 
 #### Clone远程仓库到本地
