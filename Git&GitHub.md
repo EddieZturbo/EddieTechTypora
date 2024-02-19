@@ -4,13 +4,13 @@
 
 Git是免费的**开源**的 **分布式版本控制系统**（区别去集中式） 可以快速且高效的处理小型或大型的各种项目
 
-![image-20221211111622771](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221211111622771.png)
+![image-20240219111403186](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20240219111403186.png)
 
-![image-20221112171557283](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221112171557283.png)
+### Git介绍
 
 ![image-20221112171759454](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221112171759454.png)
 
-### Git介绍
+![image-20221211111622771](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221211111622771.png)
 
 #### 版本控制
 
@@ -19,6 +19,8 @@ Git是免费的**开源**的 **分布式版本控制系统**（区别去集中�
 ![image-20221112172148983](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221112172148983.png)
 
 #### 分布式版本控制和集中式版本控制
+
+![image-20221112171557283](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221112171557283.png)
 
 ![image-20221112190100784](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221112190100784.png)
 
