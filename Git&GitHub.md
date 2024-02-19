@@ -1,4 +1,6 @@
-# Git
+# Git&GitHub
+
+## Git
 
 Git是免费的**开源**的 **分布式版本控制系统**（区别去集中式） 可以快速且高效的处理小型或大型的各种项目
 
@@ -375,7 +377,7 @@ file/
 
 ![image-20221113161544096](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221113161544096.png)
 
-# Git Hub
+## Git Hub
 
 https://rahuldkjain.github.io/gh-profile-readme-generator/
 
