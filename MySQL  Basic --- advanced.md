@@ -4,6 +4,65 @@
 
 ![image-20220926085405282](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20220926085405282.png)
 
+### Installation For Windows
+
+![image-20240311120532536](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20240311120532536.png)
+
+![image-20240311121139071](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20240311121139071.png)
+
+![image-20240311120643901](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20240311120643901.png)
+
+> Don't have data folder (**Auto generate** by `mysqld --initialize --console`)
+
+```ini
+[mysql]
+# 设置mysql客户端默认字符集
+default-character-set=utf8
+[mysqld]
+# 设置3306端口
+port = 3306
+# 设置mysql的安装目录
+basedir= D:\MySQL__8.0\mysql-8.0.30-winx64
+# 设置mysql数据库的数据的存放目录
+datadir= D:\MySQL__8.0\mysql-8.0.30-winx64\data
+# 允许最大连接数
+max_connections=20
+# 服务端使用的字符集默认为8比特编码的latin1字符集
+character-set-server=utf8
+# 创建新表时将使用的默认存储引擎
+default-storage-engine=INNODB
+```
+
+```bash
+mysqld --initialize --console
+```
+![image-20240311121340343](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20240311121340343.png)
+
+![image-20240311121428949](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20240311121428949.png)
+
+```bash
+mysqld --install mysql
+```
+
+![image-20240311145133772](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20240311145133772.png)
+
+```bash
+net start mysql
+```
+
+![image-20240311145352435](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20240311145352435.png)
+
+```bash
+mysql -u root -p
+
+password: initial
+
+ALTER USER root@localhost IDENTIFIED BY ‘root’;
+```
+
+
+
+
 ### MySQL★
 
 **连接到MySQL数据库的操作**

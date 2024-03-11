@@ -235,6 +235,10 @@ git config -l
 
 ![image-20240219112554486](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20240219112554486.png)
 
+![image-20240219135932327](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20240219135932327.png)
+
+![image-20240219135621856](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20240219135621856.png)
+
 ![image-20221113002225304](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221113002225304.png)
 
 #### Clone远程仓库到本地

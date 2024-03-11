@@ -1,4 +1,4 @@
-# Java8函数式编程
+# Java8 New Feature
 
 ## Lambda表达式
 

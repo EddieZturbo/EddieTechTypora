@@ -16,6 +16,8 @@ https://www.nginx.com/
 
 ## Linux安装nginx
 
+### Manually
+
 > **在linux下安装nginx，首先需要安装 gcc-c++编译器。然后安装nginx依赖的pcre和zlib包。最后安装nginx即可。**
 
 1.先安装gcc-c++编译器
@@ -93,163 +95,116 @@ ps -ef | grep nginx
 
 ![image-20230108232809842](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20230108232809842.png)
 
-## Nginx配置文件结构
+### Use EPEL Software Repository
+
+> 1. **Adding the EPEL Software Repository**
+>
+>    ```bash
+>    yum install epel-release
+>    ```
+>
+> 2. **Installing Nginx**
+>
+>    ```bash
+>    yum install nginx
+>    ```
+>
+> 3. **Start Nginx**
+>
+>    ```bash
+>    systemctl start nginx
+>    ```
+>
+>    ![image-20240229152823347](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20240229152823347.png)
+
+## Nginx配置文件
+
+[Full Example Configuration | NGINX](https://www.nginx.com/resources/wiki/start/topics/examples/full/)
 
 ![image-20230129095354392](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20230129095354392.png)
 
 ![image-20230108233047491](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20230108233047491.png)
 
-- 1、**全局块**：配置影响nginx全局的指令。一般有运行nginx服务器的用户组，nginx进程pid存放路径，日志存放路径，配置文件引入，允许生成worker process数等。
-- 2、**events块**：配置影响nginx服务器或与用户的网络连接。有每个进程的最大连接数，选取哪种事件驱动模型处理连接请求，是否允许同时接受多个网路连接，开启多个网络连接序列化等。
-- 3、**http块**：可以嵌套多个server，配置代理，缓存，日志定义等绝大多数功能和第三方模块的配置。如文件引入，mime-type定义，日志自定义，是否使用sendfile传输文件，连接超时时间，单连接请求数等。
-- 4、**server块**：配置虚拟主机的相关参数，一个http中可以有多个server。
-- 5、**location块**：配置请求的路由，以及各种页面的处理情况。
+> - 1、**全局块**：配置影响nginx全局的指令。一般有运行nginx服务器的用户组，nginx进程pid存放路径，日志存放路径，配置文件引入，允许生成worker process数等。
+> - 2、**events块**：配置影响nginx服务器或与用户的网络连接。有每个进程的最大连接数，选取哪种事件驱动模型处理连接请求，是否允许同时接受多个网路连接，开启多个网络连接序列化等。
+> - 3、**http块**：可以嵌套多个server，配置代理，缓存，日志定义等绝大多数功能和第三方模块的配置。如文件引入，mime-type定义，日志自定义，是否使用sendfile传输文件，连接超时时间，单连接请求数等。
+> - 4、**server块**：配置虚拟主机的相关参数，一个http中可以有多个server。
+> - 5、**location块**：配置请求的路由，以及各种页面的处理情况。
 
 ```nginx
-#user  nobody;
-worker_processes  1;
-
-#error_log  logs/error.log;
-#error_log  logs/error.log  notice;
-#error_log  logs/error.log  info;
-
-#pid        logs/nginx.pid;
-
+user nginx;  ## Default: nobody
+worker_processes 5;  ## Default: 1
+error_log logs/error.log;
+pid logs/nginx.pid;
+worker_rlimit_nofile 8192;
 
 events {
-    worker_connections  1024;
+  worker_connections  4096;  ## Default: 1024
 }
-
 
 http {
-    include       mime.types;
-    default_type  application/octet-stream;
+  include    conf/mime.types;
+  include    /etc/nginx/proxy.conf;
+  include    /etc/nginx/fastcgi.conf;
+  index    index.html index.htm index.php;
 
-    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-    #                  '$status $body_bytes_sent "$http_referer" '
-    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+  default_type application/octet-stream;
+  log_format   main '$remote_addr - $remote_user [$time_local]  $status '
+    '"$request" $body_bytes_sent "$http_referer" '
+    '"$http_user_agent" "$http_x_forwarded_for"';
+  access_log   logs/access.log  main;
+  sendfile     on;
+  tcp_nopush   on;
+  server_names_hash_bucket_size 128; # this seems to be required for some vhosts
 
-    #access_log  logs/access.log  main;
+  server { # http server(Front-end)
+    listen       9575;
+    listen       [::]:9575;
+    server_name  localhost;
+    access_log   logs/domain1.access.log  main;
+    root         html;
 
-    sendfile        on;
-    #tcp_nopush     on;
+    location / {
+      try_files $uri $uri/ /index.html;
+    }
+    location ^~ /JMS_Frontend {
+      try_files $uri $uri/ /JMS_Frontend/index.html;
+    }
+  }
 
-    #keepalive_timeout  0;
-    keepalive_timeout  65;
+  server { # simple reverse-proxy
+    listen       80;
+    server_name  domain2.com www.domain2.com;
+    access_log   logs/domain2.access.log  main;
 
-    #gzip  on;
-
-    server {
-        listen       80;
-        server_name  localhost;
-
-        #charset koi8-r;
-
-        #access_log  logs/host.access.log  main;
-
-        location / {
-            root   html;
-            index  index.html index.htm;
-        }
-
-        #error_page  404              /404.html;
-
-        # redirect server error pages to the static page /50x.html
-        #
-        error_page   500 502 503 504  /50x.html;
-        location = /50x.html {
-            root   html;
-        }
-
-        # proxy the PHP scripts to Apache listening on 127.0.0.1:80
-        #
-        #location ~ \.php$ {
-        #    proxy_pass   http://127.0.0.1;
-        #}
-
-        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
-        #
-        #location ~ \.php$ {
-        #    root           html;
-        #    fastcgi_pass   127.0.0.1:9000;
-        #    fastcgi_index  index.php;
-        #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
-        #    include        fastcgi_params;
-        #}
-
-        # deny access to .htaccess files, if Apache's document root
-        # concurs with nginx's one
-        #
-        #location ~ /\.ht {
-        #    deny  all;
-        #}
+    # serve static files
+    location ~ ^/(images|javascript|js|css|flash|media|static)/  {
+      root    /var/www/virtual/big.server.com/htdocs;
+      expires 30d;
     }
 
-
-    # another virtual host using mix of IP-, name-, and port-based configuration
-    #
-    #server {
-    #    listen       8000;
-    #    listen       somename:8080;
-    #    server_name  somename  alias  another.alias;
-
-    #    location / {
-    #        root   html;
-    #        index  index.html index.htm;
-    #    }
-    #}
-
-
-    # HTTPS server
-    #
-    #server {
-    #    listen       443 ssl;
-    #    server_name  localhost;
-
-    #    ssl_certificate      cert.pem;
-    #    ssl_certificate_key  cert.key;
-
-    #    ssl_session_cache    shared:SSL:1m;
-    #    ssl_session_timeout  5m;
-
-    #    ssl_ciphers  HIGH:!aNULL:!MD5;
-    #    ssl_prefer_server_ciphers  on;
-
-    #    location / {
-    #        root   html;
-    #        index  index.html index.htm;
-    #    }
-    #}
-
-}
-nginx 文件结构
-
-...              #全局块
-
-events {         #events块
-   ...
-}
-
-http      #http块
-{
-    ...   #http全局块
-    server        #server块
-    { 
-        ...       #server全局块
-        location [PATTERN]   #location块
-        {
-            ...
-        }
-        location [PATTERN] 
-        {
-            ...
-        }
+    # pass requests for dynamic content to rails/turbogears/zope, et al
+    location / {
+      proxy_pass      http://127.0.0.1:8080;
     }
-    server
-    {
-      ...
+  }
+
+  upstream big_server_com {
+    server 127.0.0.3:8000 weight=5;
+    server 127.0.0.3:8001 weight=5;
+    server 192.168.0.1:8000;
+    server 192.168.0.1:8001;
+  }
+
+  server { # simple load balancing
+    listen          80;
+    server_name     big.server.com;
+    access_log      logs/big.server.access.log main;
+
+    location / {
+      proxy_pass      http://big_server_com;
     }
-    ...     #http全局块
+  }
 }
 ```
 

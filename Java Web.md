@@ -1,183 +1,4 @@
-************![image-20220920230115163](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20220920230115163.png)
-
-# 前端三大件 HTML CSS  JavaScript
-
-页面由三部分内容组成！ 
-
-分别是
-
-内容（结构）、表现、行为。 
-
-**内容（结构）**，是我们在页面中可以看到的数据。我们称之为内容。一般内容 我们使用 **html** 技术来展示。 
-
-**表现**，指的是这些内容在页面上的展示形式。比如说。布局，颜色，大小等等。一般使用 **CSS** 技术实现 
-
-**行为**，指的是页面中元素与输入设备交互的响应。一般使用 **javascript** 技术实现
-
-# JQuery
-
-JavaScript query是辅助 JavaScript 开发的 js 类库。
-
-jQuery **核心思想**！！！ 它的核心思想是 **write less,do more(写得更少,做得更多)**，所以它实现了很多浏览器的兼容问题
-
-jQuery **流行**程度 jQuery 现在已经成为最流行的 JavaScript 库，在世界前 10000 个访问最多的网站中，有超过 55%在使用 jQuery。 
-
-jQuery 好处！！！ jQuery 是免费、开源的，jQuery 的语法设计可以使开发更加便捷，例如操作文档对象、选择 DOM 元素、 制作动画效果、事件处理、使用 Ajax 以及其他功
-
-# XML
-
-![image-20220924145225500](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20220924145225500.png)
-
-## XML用途
-
-- **XML 把数据从 HTML 分离**
-- **XML 简化数据共享**
-- **XML 简化数据传输**
-- **XML 简化平台的变更**
-
-XML 数据以纯文本格式进行存储，因此提供了一种**独立于软件和硬件的数据存储方法**。
-
-通过 XML，可以在不兼容的系统之间轻松地**交换数据。**
-
-XML 数据以文本格式存储。这使得 XML 在不损失数据的情况下，更容易扩展或升级到新的操作系统、新应用程序或新的浏览器。
-
-通过 XML，您的数据可供各种阅读设备使用（手持的计算机、语音设备、新闻阅读器等），还可以供盲人或其他残障人士使用
-
-## XML 与 HTML 的主要差异
-
-XML 和 HTML 为不同的目的而设计:
-
-- XML **被设计为传输和存储数据，关注数据是什么。**
-
-- HTML 被设计用来**显示数据，关注数据的外观。**
-
-- **HTML 旨在显示信息**，而 **XML 旨在传输信息。**
-
-- XML 标记不像 HTML 标记那样是预定义的。
-
-  ## XML 不使用预定义的标记
-
-  XML 语言没有预定义的标记。
-
-  上例中的标签没有在任何 XML 标准中定义过（比如 <to> 和 <from>）。这些标签是由文档的创作者发明的。
-
-  在 HTML 中使用的标签（以及 HTML 的结构）是预定义的。HTML 文档只使用在 HTML 标准中定义过的标签（比如 <p> 、<h1> 等等）。
-
-  XML 允许创作者定义自己的标签和自己的文档结构。
-
-  ## XML 是可扩展的
-
-  即使添加（或删除）新数据，大多数 XML 应用程序也会按预期工作。
-
-  想象一个旨在显示 note.xml (<to> <from> <heading> <body>) 原始版本的应用程序。
-
-  然后想象一个新版本的 note.xml，添加了 <date> 和 <hour> 元素，并删除了 <heading>。
-
-  XML 的构造方式，旧版本的应用程序仍然可以工作：
-
-## Dom4j解析
-
-**对XML进行解析**
-
-![image-20220924152548683](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20220924152548683.png)
-
-**由于 dom4j 它不是 sun 公司的技术，而属于第三方公司的技术，我们需要使用 dom4j 就需要到 dom4j 官网下载 dom4j 的 jar 包**
-
-![image-20220924192553957](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20220924192553957.png)
-
-```java
-/**
- * 读取xml文件的内容
- */
-public class DOM4j {
-    @Test
-    public void test1() throws Exception{
-        //①通过创建SAXReader对象。来读取xml文件 获取Document对象
-        SAXReader saxReader = new SAXReader();
-        //②通过Document对象 拿到xml的根元素先
-        Document document = saxReader.read("src/XMLTest1.xml");
-        //③通过根元素对象。获取所有的book标签对象
-        Element rootElement = document.getRootElement();
-        List<Element> elements = rootElement.elements("book");
-        //④遍历每个book标签对象。然后获取到book标签对象的每一个元素  再通过getTest（）方法获得起始标签中间的文本内容
-//        Iterator<Element> iterator = elements.iterator();
-//        while(iterator.hasNext()){
-//            System.out.println(iterator.next());
-//        }
-        for (Element book :elements) {
-            Element name = book.element("name");
-            System.out.println(name.getText());
-            //辟邪剑谱
-			//葵花宝典
-        }
-    }
-}
-```
-
-```xml
-<?xml version="1.0" encoding="UTF-8" ?>
-<!--以上就是XML文件的声明 version 表示版本 encoding表示文件本身的编码集 -->
-<books>
-    <book sn="SN12341232">
-        <name>辟邪剑谱</name>
-        <price>9.9</price>
-        <author>班主任</author>
-    </book>
-    <book sn="SN12341231">
-        <name>葵花宝典</name>
-        <price>99.99</price>
-        <author>班长</author>
-    </book>
-</books>
-```
-
-# JavaEE三层架构
-
-**表示层（UI）-------------表示层（web层）**
-
-web层：与客户端交互，包括获取用户请求，传递数据，封装数据，展示数据
-
-**业务逻辑层（BLL）-----业务逻辑层（service层）**
-
-service层：复杂的业务处理，包括各种实际的逻辑运算
-
-**数据访问层（DAL）-----数据访问层（dao层）**
-
-dao层：与数据库进行交互，与数据库相关的代码在此处实现
-
-![image-20220930110347859](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20220930110347859.png)
-
-![image-20220930105933905](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20220930105933905.png)
-
-## **web 层** 
-
-com.atguigu.web/servlet/controller 
-
-## **service 层** 
-
-com.atguigu.service Service 接口包 
-
-com.atguigu.service.impl Service 接口实现类 
-
-## **dao 持久层** 
-
-com.atguigu.dao Dao 接口包 
-
-com.atguigu.dao.impl Dao 接口实现类 
-
-实体 bean 对象 com.atguigu.pojo/entity/domain/bean JavaBean 类 
-
-## 测试包 
-
-com.atguigu.test/junit 
-
-## 工具类 
-
-com.atguigu.util
-
-
-
-# Java Web★
+# Java Web
 
 ![image-20220924232505043](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20220924232505043.png)
 
@@ -3153,3 +2974,47 @@ HMACSHA256(
 [JSON Web Tokens - jwt.io](https://jwt.io/)
 
 ![image-20230612114617061](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20230612114617061.png)
+
+
+# JavaEE三层架构
+**表示层（UI）-------------表示层（web层）**
+
+web层：与客户端交互，包括获取用户请求，传递数据，封装数据，展示数据
+
+**业务逻辑层（BLL）-----业务逻辑层（service层）**
+
+service层：复杂的业务处理，包括各种实际的逻辑运算
+
+**数据访问层（DAL）-----数据访问层（dao层）**
+
+dao层：与数据库进行交互，与数据库相关的代码在此处实现
+
+![image-20220930110347859](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20220930110347859.png)
+
+![image-20220930105933905](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20220930105933905.png)
+
+## **web 层** 
+
+com.atguigu.web/servlet/controller 
+
+## **service 层** 
+
+com.atguigu.service Service 接口包 
+
+com.atguigu.service.impl Service 接口实现类 
+
+## **dao 持久层** 
+
+com.atguigu.dao Dao 接口包 
+
+com.atguigu.dao.impl Dao 接口实现类 
+
+实体 bean 对象 com.atguigu.pojo/entity/domain/bean JavaBean 类 
+
+## 测试包 
+
+com.atguigu.test/junit 
+
+## 工具类 
+
+com.atguigu.util
