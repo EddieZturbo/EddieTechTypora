@@ -731,7 +731,7 @@ chomd 777 run.sh
 
 
 
-## &Mybatis
+## Spring Boot with Mybatis
 
 ![image-20221121161514152](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121161514152.png)
 
@@ -779,7 +779,7 @@ chomd 777 run.sh
 ![image-20221121175509079](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121175509079.png)
 
 
-## &Redis
+## Spring Boot with Redis
 
 ![image-20221121224051661](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121224051661.png)
 
@@ -818,7 +818,7 @@ json序列化与反序列化：JSON格式和对象格式的相互转换
 ![image-20221121233237625](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121233237625.png)
 
 
-## &Dubbo
+## Spring Boot with Dubbo
 
 ### Spring Boot 整合 Dubbo & Zookeeper 
 
@@ -834,16 +834,17 @@ json序列化与反序列化：JSON格式和对象格式的相互转换
 
 ![image-20221115122025070](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221115122025070.png)
 
+## Spring Boot with Sa-Token
+
+[sa-token](https://sa-token.cc/doc.html#/)
+
+[sa-token-demo-springboot](https://sa-token.cc/doc.html#/start/example)
 
 ## Spring Security with JWT
 
 [Spring Security JWT Tutorial | Toptal®](https://www.toptal.com/spring/spring-security-tutorial)
 
-
-
 [JWT Tutorial](https://www.toptal.com/web/cookie-free-authentication-with-json-web-tokens-an-example-in-laravel-and-angularjs)
-
-
 
 ## Spring Boot Validation
 
@@ -1309,7 +1310,281 @@ Shortcuts for the method name (**#root.methodName**) and target class (**#root.t
 
 ## Spring Boot Schedule
 
+### QuartZ
+
 [QuartZ Tutorial](https://hackernoon.com/how-to-schedule-jobs-with-quartz-in-spring-boot)
+
+![image-20240318112603785](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20240318112603785.png)
+
+> 1. writing job store configuration
+> 2. Creating Job Bean
+> 3. Creating Trigger and Job Details
+> 4. Scheduler Job using Quartz Scheduler
+> 5. Calling Scheduler
+>
+> 
+>
+> add  dependency to your **pom.xml**.
+>
+> ```xml
+> <dependency>
+>     <groupId>org.springframework.boot</groupId>
+>     <artifactId>spring-boot-starter-quartz</artifactId>
+> </dependency>
+> ```
+>
+> configure configurations in application.properties
+>
+> ```yaml
+> spring:
+>   quartz:
+>     #store type either in-memory or jdbc to store in DB
+>     job-store-type: jdbc
+> 	#we can also use value as memory which is used to store job in in-memory
+>     jdbc:
+>       #automatically create tables used to store job and other scheduling activities
+>       initialize-schema: always
+>       #if you want to create tables manually you can use the official SQL script provided by quartz (https://github.com/callicoder/spring-boot-quartz-scheduler-email-scheduling/blob/master/src/main/resources/quartz_tables.sql)
+>     #datasource to store jobs in DB if store type is jdbc
+>     datasource:
+>       name: master
+>       url: jdbc:mysql://43.136.85.105:3317/oleap?useUnicode=true&characterEncoding=UTF-8&useSSL=false&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT
+>       username: root
+>       password: oleap@2022
+>       driverClassName: com.mysql.cj.jdbc.Driver
+>     properties:
+>       #provide multiple threads to run jobs
+>       thread-pool:
+>         thread-count: 10
+>       org:
+>         quartz:
+>           jobStore:
+>             class: org.quartz.impl.jdbcjobstore.JobStoreTX
+>             driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+> ```
+>
+> ```yaml
+> spring:
+>   #datasource configration
+>   datasource:
+>     type: com.alibaba.druid.pool.DruidDataSource
+>     driverClassName: com.mysql.cj.jdbc.Driver
+>     #druid连接池配置
+>     druid:
+>      #主库数据源
+>      master:
+>         url: jdbc:mysql://43.136.85.105:3317/oleap?useUnicode=true&characterEncoding=UTF-8&useSSL=false&autoReconnect=true&failOverReadOnly=false&serverTimezone=GMT
+>         username: root
+>         password: oleap@2022
+>      #备数据源 #关闭
+>      slave:
+>         enabled: false
+>         url: jdbc:mysql://43.136.85.105:3317/oleap?useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT&autoReconnect=true&useSSL=false
+>         username: root
+>         password: oleap@2022
+> ```
+>
+> Creating **Job Bean**（具体的任务内容）
+>
+> ```java
+> @Component
+> public class RecordCreationJob extends QuartzJobBean {
+> 
+>     @Autowired
+>     private RecordRepository recordRepository;
+> 
+>     //定时任务要执行的具体内容
+>     @Override
+>     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
+>         String dataPassed = context.getMergedJobDataMap().get("dataPassed").toString();
+>         System.out.println("Data Passed From Job Details : " + dataPassed);
+> 
+>         System.out.println("Print Records : ");
+>         recordRepository.findAll().stream().forEach(System.out::println);
+>     }
+> }
+> ```
+>
+> **Scheduler Job using Quartz Scheduler**
+>
+> :eye:Note: one job can have multiple trigger but one trigger can only have one job
+>
+> - create **JobDetails**(任务的详情配置)
+> - create **Trigger**(任务触发器 任务的触发时机配置)
+> - **Scheduler**（quartzScheduler.scheduleJob(jobDetail, trigger);关联任务和触发器绑定触发定时任务的执行操作）
+>
+> ```java
+> package com.oleap.app.common.schedule.tasks;
+> 
+> import cn.hutool.core.lang.UUID;
+> import com.oleap.app.common.schedule.job.RecordCreationJob;
+> import org.quartz.*;
+> import org.springframework.beans.factory.annotation.Autowired;
+> import org.springframework.stereotype.Service;
+> 
+> import java.time.LocalDate;
+> import java.time.LocalTime;
+> import java.time.ZoneId;
+> import java.time.ZonedDateTime;
+> import java.util.Date;
+> 
+> /**
+>  @author EddieZhang
+>  @create 2024-03-18 12:11 PM
+>  */
+> @Service
+> public class RecordService {
+> 
+>     @Autowired
+>     private Scheduler quartzScheduler;
+> 
+>     public void scheduleRecordPrinter() {
+>         try {
+>             JobDetail jobDetail = this.buildJobDetails();
+>             Trigger trigger = buildTrigger(jobDetail);
+>             quartzScheduler.scheduleJob(jobDetail, trigger);
+>         } catch (SchedulerException e) {
+>             throw new RuntimeException(e);
+>         }
+>     }
+> 
+> 
+>     //Implementation of trigger and jobdetails are mentioned above
+>     public Trigger buildTrigger(JobDetail jobDetail) {
+>         ZonedDateTime zonedDateTime = ZonedDateTime.of(LocalDate.parse("2024-03-18"),
+>                 LocalTime.of(8, 30), ZoneId.of("asia/shanghai"));
+> 
+>         return TriggerBuilder.newTrigger()
+>                 .forJob(jobDetail)
+>                 .withIdentity(jobDetail.getKey().getName(), "records-tigger")
+>                 .withIdentity("Records Trigger Description")
+>                 .startAt(Date.from(zonedDateTime.toInstant()))
+>                 /*
+>                      // Some Scheduler Example
+>                      .withSchedule(impleScheduleBuilder.simpleSchedule().withIntervalInHours(1))
+> 
+>                       --> cron scheduler
+>                      .withSchedule(CronScheduleBuilder.cronSchedule("0 0 16 * * ?")
+>                              .withMisfireHandlingInstructionFireAndProceed())
+> 
+>                 */
+>                 .withSchedule(SimpleScheduleBuilder.simpleSchedule().withIntervalInSeconds(5).repeatForever())
+>                 .build();
+> 
+> 
+>     }
+> 
+>     public JobDetail buildJobDetails() {
+>         //create map to store key-value (can be received from request) which can be passed to job
+>         JobDataMap jobDataMap = new JobDataMap();
+>         jobDataMap.put("dataPassed", "Data can be passed to job it can be request Data or other");
+> 
+>         return JobBuilder.newJob(RecordCreationJob.class)
+>                 .withIdentity(UUID.randomUUID().toString(), "record-jobs") // unique job key
+>                 .withDescription("Record Job Description")
+>                 .usingJobData(jobDataMap) // values to pass to job
+>                 .storeDurably(true) //false - delete job once job executed
+>                 .build();
+>     }
+> 
+> }
+> ```
+>
+> **Calling Scheduler**
+>
+> ```java
+> SpringBootApplication
+> public class QuartzSchedulerApplication {
+> 
+>    public static void main(String[] args) {
+>       ApplicationContext context = SpringApplication.run(QuartzSchedulerApplication.class, args);
+> 
+>       RecordService recordService = context.getBean(RecordService.class);
+>       recordService.scheduleRecordPrinter();
+>    }
+> }
+> ```
+>
+> 
+
+## Spring Boot with Knife4j
+
+[Spring Boot with Knife4j](https://doc.xiaominfo.com/docs/action/springboot)
+
+> 1. import dependency
+> 2. Creating Knife4jConfiguration
+> 3. use annotation on RESTful Controller
+> 4. View API Document
+>
+> ```xml
+> <dependency>
+> 	<groupId>com.github.xiaoymin</groupId>
+> 	<artifactId>knife4j-spring-boot-starter</artifactId>
+> 	<version>2.0.7</version>
+> </dependency>
+> ```
+>
+> ```java
+> @Configuration
+> @EnableSwagger2WebMvc
+> public class Knife4jConfiguration {
+>     @Autowired
+>     private OLeapAppConfig OLeapAppConfig;
+> 
+>     @Bean(value = "defaultApi")
+>     public Docket defaultApi() {
+> //    	Contact contact=new Contact();
+>         Docket docket = new Docket(DocumentationType.SWAGGER_2)
+>                 .apiInfo(new ApiInfoBuilder()
+>                         .title("App RESTful APIs")
+>                         .description("App RESTful APIs")
+>                         //服务条款Url
+> //                        .termsOfServiceUrl("https://gitee.com/bdj/SpringBoot_v2/blob/master/LICENSE")
+> //                        .contact(contact)
+>                         .version(OLeapAppConfig.getVersion())
+>                         .build())
+>                 //分组名称
+>                 .groupName("v1.0.0")
+>                 .select()
+>                 //这里指定Controller扫描包路径
+>                 .apis(RequestHandlerSelectors.basePackage("com.eddie.app.controller"))
+>                 .paths(PathSelectors.any())
+>                 .build();
+>         return docket;
+>     }
+> }
+> ```
+>
+> ```java
+> /**
+>  @author EddieZhang
+>  @create 2024-03-15 9:51 AM
+>  */
+> @Api(tags = "用户模块")
+> @RestController
+> @RequestMapping("/user")
+> public class UserController {
+>     @Autowired
+>     private UserService userService;
+> 
+>     @RequestMapping("/userList")
+>     @ApiOperation(value = "获取用户列表")
+>     public Result<List<User>> userList() {
+>         List<User> userList = userService.list();
+>         if (userList == null || userList.size() == 0) {
+>             return Result.ok(null, "No user found");
+>         } else {
+>             return Result.ok(userList);
+>         }
+> 
+>     }
+> }
+> ```
+>
+> **API Document**
+>
+> http://localhost:8080/doc.html#/home
+> ![image-20240318142152743](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20240318142152743.png)
 
 ## Spring Boot Annotation
 
