@@ -102,6 +102,32 @@ maven会沿着父子层次向上走，直到找到拥有DependencyManagement元�
 
 ![image-20221108203908358](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221108203908358.png)
 
+## Pom War Jar
+
+> ### pom工程
+>
+> pom工程用在父级工程或聚合工程中。用来做jar包的版本控制。
+>
+> pom打出来可以作为其他项目的maven依赖,比如你写了两个工程，工程a写了一些工具类，然后你可以把它打成pom，再在工程b里面添加a的依赖，然后你在工程b中就可以使用a定义好的工具类。
+>
+> Maven是以项目为中心的设计。POM(project object model)是Maven对一个单一项目的描述。没有POM的话，Maven是毫无用处的——POM是Maven的核心。是POM实现的并驱动了这种以模型来描述的构建方式。
+>
+> ### war工程
+>
+> **需要部署到额外的例如Tomcat服务器上进行项目运行**
+>
+> war工程将会打包成war，发布在服务器上的工程，如网站或服务。所以service通常打包成war包。war常用于java web工程，但也不是绝对的，war也可以用java -jar xxx.war执行，前提是你有配置main函数入口
+>
+> war包是Sun提出的一种web应用程序格式，与jar类似，是很多文件的压缩包。war包中的文件按照一定目录结构来组织。根据其根目录下包含有html和jsp文件，或者包含有这两种文件的目录，另外还有WEB-INF目录。通常在WEB-INF目录下含有一个web.xml文件和一个classes目录，web.xml是这个应用的配置文件，而classes目录下则包含编译好的servlet类和jsp，或者servlet所依赖的其他类(如JavaBean)。通常这些所依赖的类也可以打包成jar包放在WEB-INF下的lib目录下。
+>
+> ### jar工程
+>
+> jar工程将会打包成jar用作jar包使用。**可直接运行 例如Spring Boot项目内嵌Tomcat服务器**
+>
+> jar是maven出来之前三方库普遍使用的方式，比较常见的是jdbc驱动包，一般从官网下载下来的都是jar文件。也可以打成可执行文件，类似.exe那样的，用命令java -jar xxx.jar执行。
+>
+> 一个可执行的jar 文件是一个自包含的 Java 应用程序，它存储在特别配置的JAR 文件中，可以由 JVM 直接执行它而无需事先提取文件或者设置类路径。要运行存储在非可执行的 JAR 中的应用程序，必须将它加入到您的类路径中，并用名字调用应用程序的主类。但是使用可执行的 JAR 文件，我们可以不用提取它或者知道主要入口点就可以运行一个应用程序。可执行 JAR 有助于方便发布和执行 Java 应用程序。
+
 ## 跳过Test
 
 ![image-20221204162053284](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221204162053284.png)

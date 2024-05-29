@@ -817,6 +817,14 @@ json序列化与反序列化：JSON格式和对象格式的相互转换
 
 ![image-20221121233237625](https://eddie-typora-image.oss-cn-shenzhen.aliyuncs.com/typora-user-images/image-20221121233237625.png)
 
+## Spring Boot with ElasticSearch
+
+> 1. Configure Elasticsearch dependencies
+> 2. Configure Elasticsearch connection
+> 3. Define model class and Create a repository interface
+> 4. Implement a REST controller
+>
+> 
 
 ## Spring Boot with Dubbo
 
@@ -1525,6 +1533,18 @@ Shortcuts for the method name (**#root.methodName**) and target class (**#root.t
 > ```
 >
 > ```java
+> package com.oleap.app.common.conf;
+> 
+> import org.springframework.beans.factory.annotation.Autowired;
+> import org.springframework.context.annotation.Bean;
+> import org.springframework.context.annotation.Configuration;
+> import springfox.documentation.builders.ApiInfoBuilder;
+> import springfox.documentation.builders.PathSelectors;
+> import springfox.documentation.builders.RequestHandlerSelectors;
+> import springfox.documentation.spi.DocumentationType;
+> import springfox.documentation.spring.web.plugins.Docket;
+> import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
+> 
 > @Configuration
 > @EnableSwagger2WebMvc
 > public class Knife4jConfiguration {
@@ -1536,8 +1556,8 @@ Shortcuts for the method name (**#root.methodName**) and target class (**#root.t
 > //    	Contact contact=new Contact();
 >         Docket docket = new Docket(DocumentationType.SWAGGER_2)
 >                 .apiInfo(new ApiInfoBuilder()
->                         .title("App RESTful APIs")
->                         .description("App RESTful APIs")
+>                         .title("OLeapApp RESTful APIs")
+>                         .description("OLeapApp RESTful APIs")
 >                         //服务条款Url
 > //                        .termsOfServiceUrl("https://gitee.com/bdj/SpringBoot_v2/blob/master/LICENSE")
 > //                        .contact(contact)
@@ -1547,12 +1567,13 @@ Shortcuts for the method name (**#root.methodName**) and target class (**#root.t
 >                 .groupName("v1.0.0")
 >                 .select()
 >                 //这里指定Controller扫描包路径
->                 .apis(RequestHandlerSelectors.basePackage("com.eddie.app.controller"))
+>                 .apis(RequestHandlerSelectors.basePackage("com.oleap.app.controller"))
 >                 .paths(PathSelectors.any())
 >                 .build();
 >         return docket;
 >     }
 > }
+> 
 > ```
 >
 > ```java
